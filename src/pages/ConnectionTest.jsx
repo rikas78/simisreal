@@ -164,4 +164,100 @@ export default function ConnectionTest() {
 
       {/* CTA */}
       <div className="racing-card bg-card p-6 text-center space-y-4">
- 
+        {!running && !results && (
+          <>
+            <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center mx-auto">
+              <Wifi className="w-9 h-9 text-primary" />
+            </div>
+            <p className="text-muted-foreground text-sm">Pronto a testare la tua connessione?</p>
+            <Button onClick={runTest} className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 h-11">
+              <Zap className="w-4 h-4 mr-2" />
+              Avvia Test Rete
+            </Button>
+          </>
+        )}
+
+        {running && (
+          <div className="space-y-4">
+            <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center mx-auto">
+              <Activity className="w-9 h-9 text-primary animate-pulse" />
+            </div>
+            <p className="font-semibold text-foreground">{step}</p>
+            <div className="max-w-xs mx-auto">
+              <ProgressBar value={progress} color="bg-primary" />
+              <p className="text-xs text-muted-foreground mt-1">{progress}%</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => { stopRef.current = true; setRunning(false); }}>
+              Interrompi
+            </Button>
+          </div>
+        )}
+
+        {results && !running && (
+          <div className="space-y-2">
+            <div className={cn('inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold', overallCfg?.bg, overallCfg?.color)}>
+              <span className="text-lg">{verdicts[overall].emoji}</span>
+              {verdicts[overall].text}
+            </div>
+            <p className="text-xs text-muted-foreground">{verdicts[overall].sub}</p>
+            <Button onClick={runTest} variant="outline" size="sm" className="mt-2">
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />Ripeti Test
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Metrics */}
+      {results && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard icon={Clock} label="Ping" value={results.ping} unit="ms"
+            rating={getRating('ping', results.ping)} target="< 30ms" />
+          <MetricCard icon={Activity} label="Jitter" value={results.jitter} unit="ms"
+            rating={getRating('jitter', results.jitter)} target="< 5ms" />
+          <MetricCard icon={Wifi} label="Continuità" value={results.packet} unit="%"
+            rating={getRating('packet', results.packet)} target="> 98%" />
+          <MetricCard icon={Download} label="Download" value={results.download} unit=" Mbps"
+            rating={getRating('download', results.download)} target="> 10 Mbps" />
+        </div>
+      )}
+
+      {/* Consigli */}
+      {results && overall !== 'good' && (
+        <div className="racing-card bg-card p-5 space-y-3">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Consigli per migliorare</p>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {results.ping > 30 && <li className="flex items-start gap-2"><span className="text-accent mt-0.5">→</span>Usa una connessione cablata (Ethernet) invece del Wi-Fi</li>}
+            {results.jitter > 5 && <li className="flex items-start gap-2"><span className="text-accent mt-0.5">→</span>Chiudi app e download in background che saturano la rete</li>}
+            {results.download < 10 && <li className="flex items-start gap-2"><span className="text-accent mt-0.5">→</span>Verifica con il tuo operatore o riavvia il router</li>}
+            {results.packet < 99 && <li className="flex items-start gap-2"><span className="text-accent mt-0.5">→</span>Perdita pacchetti rilevata — possibile instabilità del router</li>}
+          </ul>
+        </div>
+      )}
+
+      {/* History */}
+      {history.length > 1 && (
+        <div className="racing-card bg-card p-5">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Ultimi Test</p>
+          <div className="space-y-2">
+            {history.map((h, i) => {
+              const r = getOverallRating(h);
+              const cfg = ratingConfig[r];
+              return (
+                <div key={i} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground text-xs">
+                    {h.ts.toLocaleTimeString('it')}
+                  </span>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span>Ping: <b className="text-foreground">{h.ping}ms</b></span>
+                    <span>DL: <b className="text-foreground">{h.download} Mbps</b></span>
+                    <span className={cn('font-semibold', cfg.color)}>{cfg.label}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

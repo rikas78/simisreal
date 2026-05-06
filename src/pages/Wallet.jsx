@@ -120,4 +120,75 @@ export default function Wallet() {
           </div>
           <Button onClick={() => createWallet.mutate()} disabled={createWallet.isPending} className="bg-primary text-primary-foreground">
             {createWallet.isPending ? 'Attivazione...' : 'Attiva Wallet — Ricevi Bonus'}
- 
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Bonus expiry warning */}
+          {wallet.bonus_expires_at && (wallet.gw_bonus || 0) > 0 && (
+            <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-accent/30 bg-accent/5">
+              <Clock className="w-4 h-4 text-accent flex-shrink-0" />
+              <p className="text-sm text-accent">
+                I tuoi GW Bonus scadono il <strong>{format(new Date(wallet.bonus_expires_at), 'd MMMM yyyy', { locale: it })}</strong>
+              </p>
+            </div>
+          )}
+
+          {/* Balances */}
+          <WalletBalanceCard wallet={wallet} />
+
+          {/* CTAs */}
+          <div className="grid grid-cols-2 gap-3">
+            <Link to="/wallet/ricarica">
+              <Button className="w-full bg-primary text-primary-foreground h-11">
+                <ArrowDownLeft className="w-4 h-4 mr-2" /> Ricarica
+              </Button>
+            </Link>
+            <Link to="/wallet/prelievo">
+              <Button variant="outline" className={`w-full h-11 ${!canW ? 'border-destructive/30 text-destructive' : 'border-primary/30 text-primary'}`}>
+                <ArrowUpRight className="w-4 h-4 mr-2" /> Prelievo
+              </Button>
+            </Link>
+          </div>
+
+          {/* Withdrawal blocks */}
+          {!canW && (
+            <div className="space-y-2">
+              {blockReasons.map((r, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-destructive/20 bg-destructive/5">
+                  <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+                  <p className="text-xs text-destructive">{r}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* KYC CTA */}
+          {kyc_status !== 'approved' && (
+            <Link to="/kyc" className="block">
+              <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-accent/30 bg-accent/5 hover:bg-accent/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <ShieldCheck className="w-5 h-5 text-accent" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Completa la verifica KYC</p>
+                    <p className="text-xs text-muted-foreground">Necessario per prelievi e gare con premio reale</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </Link>
+          )}
+
+          {/* Recent transactions */}
+          <div className="racing-card bg-card overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Movimenti Recenti</h3>
+              <Link to="/wallet/movimenti" className="text-xs text-primary hover:underline">Vedi tutti →</Link>
+            </div>
+            <WalletRecentTx transactions={transactions} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

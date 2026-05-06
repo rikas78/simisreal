@@ -205,4 +205,271 @@ function ZoneNode({ zone, active, onClick }) {
         zone.bg, zone.border,
         active ? "scale-110" : "group-hover:scale-105"
       )}>
- 
+        {/* Pulse ring */}
+        <div className={cn(
+          "absolute inset-0 rounded-full animate-ping opacity-10",
+          zone.color.replace('text-', 'bg-')
+        )} style={{ animationDuration: '3s' }} />
+        <Icon className={cn("w-5 h-5 relative z-10", zone.color)} />
+      </div>
+      {/* Label */}
+      <p className={cn("mt-1.5 text-[8px] font-black uppercase tracking-widest whitespace-nowrap", zone.color)}>
+        {zone.label}
+      </p>
+    </div>
+  );
+}
+
+// ── Center Emblem Display ─────────────────────────────────────────────────────
+function CenterDisplay({ pilot, liveRaces }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+      <div className="flex flex-col items-center gap-4">
+        {/* Emblem */}
+        <div className="relative flex items-center justify-center">
+          {/* Outer ring */}
+          <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border border-white/5 absolute" />
+          <div className="w-24 h-24 md:w-36 md:h-36 rounded-full border border-destructive/20 absolute" />
+          {/* Inner glow circle */}
+          <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-destructive/5 border border-destructive/30 flex items-center justify-center" style={{ boxShadow: '0 0 40px rgba(220,38,38,0.15)' }}>
+            <Zap className="w-7 h-7 md:w-10 md:h-10 text-destructive opacity-80" />
+          </div>
+          {/* Live badge */}
+          {liveRaces > 0 && (
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 bg-destructive text-white text-[8px] font-black uppercase tracking-widest rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              {liveRaces} LIVE
+            </div>
+          )}
+        </div>
+
+        {/* Brand */}
+        <div className="text-center">
+          <p className="font-heading text-lg md:text-2xl font-black uppercase italic tracking-tight text-white/80 leading-none">
+            SIM <span className="text-destructive">is</span> REAL
+          </p>
+          {pilot ? (
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mt-1">
+              {pilot.username} · {pilot.category || 'START'}
+            </p>
+          ) : (
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mt-1">
+              FULL PADDOCK PLATFORM
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Zone Detail Panel ─────────────────────────────────────────────────────────
+function ZonePanel({ zone, onClose, races }) {
+  if (!zone) return null;
+  const Icon = zone.icon;
+  const relevantRaces = zone.id === 'circuits'
+    ? races.filter(r => r.status === 'live' || r.status === 'upcoming').slice(0, 3)
+    : [];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div
+        className={cn(
+          "relative w-full max-w-sm bg-black border rounded-2xl overflow-hidden shadow-2xl",
+          zone.border
+        )}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header image */}
+        <div className="relative h-40 overflow-hidden">
+          <img src={zone.imgUrl} alt={zone.label} className="w-full h-full object-cover opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+          <div className="absolute bottom-4 left-4 flex items-center gap-3">
+            <div className={cn("w-10 h-10 rounded-lg border flex items-center justify-center", zone.bg, zone.border)}>
+              <Icon className={cn("w-5 h-5", zone.color)} />
+            </div>
+            <div>
+              <p className={cn("font-black text-sm uppercase italic tracking-widest", zone.color)}>{zone.label}</p>
+              <p className="text-white/50 text-xs font-bold">{zone.sublabel}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-5 space-y-4">
+          <p className="text-white/70 text-sm">{zone.description}</p>
+
+          {relevantRaces.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Prossime Gare</p>
+              {relevantRaces.map(r => (
+                <div key={r.id} className="flex items-center justify-between py-2 border-b border-white/5">
+                  <p className="text-sm font-bold text-white truncate flex-1">{r.title}</p>
+                  <span className={cn("text-[9px] font-black uppercase px-2 py-0.5 rounded ml-2",
+                    r.status === 'live' ? "bg-destructive text-white" : "bg-white/10 text-white/60"
+                  )}>{r.status === 'live' ? '⬤ LIVE' : 'UPCOMING'}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <Link
+            to={zone.to}
+            onClick={onClose}
+            className={cn(
+              "block w-full text-center py-3.5 font-black uppercase italic text-sm tracking-widest rounded-lg border transition-all",
+              zone.bg, zone.border, zone.color,
+              "hover:brightness-125"
+            )}
+          >
+            ENTRA → {zone.label}
+          </Link>
+        </div>
+
+        <button onClick={onClose} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs">✕</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
+const SPLASH_KEY = 'srf_splash_seen';
+
+export default function Home() {
+  const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem(SPLASH_KEY));
+  const [activeZone, setActiveZone] = useState(null);
+
+  const { data: races = [] } = useQuery({ queryKey: ['races'], queryFn: () => base44.entities.Race.list('-date', 50) });
+  const { data: pilots = [] } = useQuery({ queryKey: ['pilots'], queryFn: () => base44.entities.Pilot.list('-total_points', 50) });
+  const { data: currentUser } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+
+  const myPilot = pilots.find(p => p.created_by === currentUser?.email);
+  const liveCount = races.filter(r => r.status === 'live').length;
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem(SPLASH_KEY, '1');
+    setShowSplash(false);
+  };
+
+  return (
+    <>
+      {showSplash && <IntroSplash onDone={handleSplashDone} />}
+
+      {/* ── DESKTOP: Paddock Map ────────────────────────────────────────────── */}
+      <div className="hidden md:block relative w-full overflow-hidden" style={{ height: 'calc(100vh - 0px)' }}>
+        {/* Background */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?auto=format&fit=crop&q=80&w=2000"
+            alt="Paddock"
+            className="w-full h-full object-cover opacity-20 grayscale contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/50 to-background/95" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
+          <div className="absolute inset-0 opacity-[0.025]"
+            style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }}
+          />
+        </div>
+
+        {/* Zone nodes */}
+        {ZONES.map(zone => (
+          <ZoneNode key={zone.id} zone={zone} active={activeZone?.id === zone.id} onClick={setActiveZone} />
+        ))}
+
+        {/* Center emblem */}
+        <CenterDisplay pilot={myPilot} liveRaces={liveCount} />
+
+        {/* Top HUD */}
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4 pointer-events-none">
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-destructive italic">SIM is REAL</p>
+            <p className="text-[8px] uppercase tracking-widest text-white/20 font-bold">Full Paddock Platform</p>
+          </div>
+          <div className="flex items-center gap-6">
+            {liveCount > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-destructive">{liveCount} GARE LIVE</span>
+              </div>
+            )}
+            <p className="text-[9px] font-black uppercase tracking-widest text-white/25">{pilots.length} PILOTI</p>
+          </div>
+        </div>
+
+        {/* Bottom hint */}
+        <div className="absolute bottom-6 left-0 right-0 z-20 text-center pointer-events-none">
+          <p className="text-[8px] uppercase tracking-[0.4em] text-white/10 font-bold">seleziona una zona</p>
+        </div>
+      </div>
+
+      {/* ── MOBILE: Zone Grid ───────────────────────────────────────────────── */}
+      <div className="md:hidden flex flex-col min-h-screen bg-background">
+        {/* Header */}
+        <div className="relative overflow-hidden px-5 pt-6 pb-5 border-b border-border/50">
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+          />
+          <div className="relative flex items-center justify-between">
+            <div>
+              <h1 className="font-heading text-2xl font-black uppercase italic text-white leading-none">
+                SIM <span className="text-destructive">is</span> REAL
+              </h1>
+              <p className="text-[8px] uppercase tracking-widest text-white/25 font-bold mt-0.5">FULL PADDOCK PLATFORM</p>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              {liveCount > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-destructive">{liveCount} LIVE</span>
+                </div>
+              )}
+              {myPilot && (
+                <p className="text-[9px] text-white/30 font-bold uppercase tracking-wider">{myPilot.username}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Zone grid */}
+        <div className="grid grid-cols-2 gap-3 p-4 flex-1">
+          {ZONES.map(zone => {
+            const Icon = zone.icon;
+            return (
+              <button
+                key={zone.id}
+                onClick={() => setActiveZone(zone)}
+                className={cn(
+                  "flex flex-col items-start gap-3 p-4 rounded-xl border text-left transition-all",
+                  zone.bg, zone.border
+                )}
+              >
+                <div className={cn("w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0", zone.bg, zone.border)}>
+                  <Icon className={cn("w-4 h-4", zone.color)} />
+                </div>
+                <div>
+                  <p className={cn("text-[9px] font-black uppercase tracking-widest", zone.color)}>{zone.label}</p>
+                  <p className="text-[10px] text-white/40 mt-0.5">{zone.sublabel}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Profile quick access */}
+        <div className="p-4 border-t border-border/50">
+          <Link to="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border/50 bg-secondary/30">
+            <User className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-semibold text-foreground">{myPilot ? myPilot.username : 'Il tuo Profilo'}</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Zone detail panel */}
+      {activeZone && (
+        <ZonePanel zone={activeZone} races={races} onClose={() => setActiveZone(null)} />
+      )}
+    </>
+  );
+}

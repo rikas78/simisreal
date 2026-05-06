@@ -194,4 +194,63 @@ export default function Messages() {
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 {activeConv.type === 'race'
                   ? <Flag className="w-4 h-4 text-primary" />
- 
+                  : <span className="font-heading text-xs text-primary">{activeConv.label?.[0]?.toUpperCase()}</span>
+                }
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-foreground">{activeConv.label}</p>
+                <p className="text-[10px] text-muted-foreground">{activeConv.type === 'race' ? 'Chat Gara' : 'Messaggio Diretto'}</p>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {convMessages.length === 0 && (
+                <p className="text-center text-xs text-muted-foreground mt-10">Nessun messaggio. Inizia la conversazione!</p>
+              )}
+              {convMessages.map(msg => {
+                const isMe = msg.sender_id === me?.id;
+                return (
+                  <div key={msg.id} className={cn("flex gap-2", isMe ? "justify-end" : "justify-start")}>
+                    {!isMe && (
+                      <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center font-heading text-[10px] flex-shrink-0 mt-0.5">
+                        {msg.sender_username?.[0]?.toUpperCase()}
+                      </div>
+                    )}
+                    <div className={cn("max-w-[70%]", isMe && "items-end flex flex-col")}>
+                      {!isMe && <p className="text-[10px] text-muted-foreground mb-0.5 ml-1">{msg.sender_username}</p>}
+                      <div className={cn(
+                        "px-3 py-2 rounded-2xl text-sm",
+                        isMe ? "bg-primary text-primary-foreground rounded-tr-sm" : "bg-card text-foreground rounded-tl-sm border border-border"
+                      )}>
+                        {msg.content}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 mx-1">
+                        {msg.created_date ? format(parseISO(msg.created_date), 'HH:mm', { locale: it }) : ''}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              <div ref={bottomRef} />
+            </div>
+
+            {/* Input */}
+            <div className="p-3 border-t border-border flex gap-2">
+              <Input
+                value={newMsg}
+                onChange={e => setNewMsg(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSend()}
+                placeholder="Scrivi un messaggio..."
+                className="bg-card border-border flex-1"
+              />
+              <Button onClick={handleSend} disabled={!newMsg.trim() || sendMutation.isPending} className="bg-primary text-primary-foreground">
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

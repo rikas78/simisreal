@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "src/utils"
+		},
+		{
+			"path": "src/pages"
+		},
+		{
+			"path": "src/lib"
+		},
+		{
+			"path": "src/hooks"
+		},
+		{
+			"path": "src/components"
+		},
+		{
+			"path": "src/api"
+		}
+	]
+}

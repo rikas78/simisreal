@@ -1,0 +1,23 @@
+SIM IS REAL
+Documento Master Integrato
+Capitolo 5 — Architettura tecnica e infrastruttura
+
+L’architettura tecnica di SIM IS REAL deve sostenere identità, eventi, wallet, telemetria, marketplace e ruoli in un sistema coerente, scalabile e mantenibile. La piattaforma non può essere progettata come una somma di funzioni isolate, ma come un insieme integrato di servizi che condividono dati, logiche di accesso e priorità di rilascio. Per questo il lavoro tecnico deve partire dai flussi core e non dalle estensioni accessorie.
+
+Il frontend deve essere istituzionale, veloce e modulare, con una struttura che renda leggibili le aree pubbliche e quelle riservate. Il backend deve supportare autenticazione, eventi, wallet, transazioni e analisi dati, mentre il database deve conservare in modo affidabile profili, ruoli, movimenti e storico attività. La qualità del modello dati è essenziale perché il progetto unisce funzioni relazionali, economiche e temporali in un unico ecosistema.
+
+Le integrazioni esterne riguarderanno KYC, email, storage file, servizi AI e, in prospettiva, componenti di telemetria e analisi più evolute. Ogni integrazione dovrà essere progettata come modulo distinto, con dipendenze esplicite e possibilità di sostituzione. Questo riduce il rischio tecnico e rende la piattaforma più solida nel tempo.
+
+Il principio guida è semplice: ogni componente deve avere una funzione chiara, un confine leggibile e un impatto concreto sull’esperienza dell’utente o sull’operatività del sistema.
+
+Capitolo 6 — Regolamento federale
+
+Il regolamento federale definisce i requisiti di accesso, i ruoli, la valuta interna, le regole economiche, la struttura delle scuderie e il quadro operativo delle gare. È il perimetro che consente alla piattaforma di funzionare come un sistema ordinato e non come un insieme informale di attività. Ogni funzione del prodotto deve essere coerente con questo quadro, perché il regolamento non è un accessorio ma la base della credibilità del progetto.
+
+L’accesso parte da un’identità federale unica. Il driver deve poter creare un solo account, collegato ai suoi riferimenti sui diversi simulatori supportati, con username definitivo e profilo riconoscibile. Le funzioni con impatto economico o con premi reali richiedono un livello di verifica appropriato, così da rendere chiaro quando un utente è semplice partecipante e quando è pienamente abilitato alle attività sensibili.
+
+La valuta interna, Golden Wheels, è il motore economico della piattaforma. GW promozionali, GW guadagnati e GW bloccati devono essere separati con chiarezza, così che l’utente comprenda sempre cosa può spendere, cosa può ritirare e cosa è temporaneamente congelato. Questa distinzione è cruciale non solo per la UX, ma anche per la sicurezza del sistema e la coerenza delle regole.
+
+Le scuderie rappresentano la dimensione organizzativa più evoluta del progetto. Non sono semplici gruppi informali, ma strutture federate con ruoli, obblighi, costi e responsabilità. Il team manager diventa quindi una figura centrale, perché coordina i piloti, gestisce le iscrizioni, amministra il roster e interagisce con la governance della piattaforma. Anche in questo caso, il regolamento serve a rendere chiaro ciò che la piattaforma consente e ciò che invece non è ammesso.
+
+Le gare e i campionati devono seguire logiche trasparenti di iscrizione, gestione slot, premi, contestazioni e risultati. Il sistema deve sapere quando un evento è valido, quando un driver può entrare, come si gestisce un ritiro e come si distribuiscono i premi. La chiarezza regolamentare è la condizione che permette alla piattaforma di essere percepita come seria e affidabile.

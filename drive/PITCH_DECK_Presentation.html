@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM IS REAL - Investor Pitch Deck</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        
+        .slide {
+            width: 100%;
+            min-height: 100vh;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            page-break-after: always;
+            position: relative;
+        }
+        
+        /* Cover Slide */
+        .slide-cover {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #000 100%);
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .slide-cover h1 {
+            font-size: 72px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+        
+        .slide-cover .tagline {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .slide-cover .subtitle {
+            font-size: 18px;
+            opacity: 0.7;
+            margin-top: 60px;
+        }
+        
+        /* Standard Slide */
+        .slide h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #e74c3c;
+        }
+        
+        .slide h3 {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 30px 0 20px;
+            color: #ecf0f1;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .content-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .content-box h4 {
+            font-size: 24px;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .content-box p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .stat-box .number {
+            font-size: 64px;
+            font-weight: 900;
+            color: #e74c3c;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .stat-box .label {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+        
+        .bullet-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .bullet-list li {
+            font-size: 18px;
+            line-height: 1.8;
+            padding: 15px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+        
+        .bullet-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #e74c3c;
+            font-weight: 900;
+            font-size: 24px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            margin: 30px 0;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-table th {
+            background: rgba(231, 76, 60, 0.2);
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        
+        .comparison-table td {
+            font-size: 16px;
+        }
+        
+        .yes {
+            color: #2ecc71;
+            font-weight: 700;
+        }
+        
+        .no {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+        
+        .timeline-item {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            margin: 20px 0;
+            border-left: 4px solid #e74c3c;
+            border-radius: 8px;
+        }
+        
+        .timeline-item h4 {
+            font-size: 22px;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-item p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .financial-box {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid rgba(46, 204, 113, 0.3);
+            margin: 20px 0;
+        }
+        
+        .financial-box h4 {
+            font-size: 24px;
+            color: #2ecc71;
+            margin-bottom: 20px;
+        }
+        
+        .financial-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 18px;
+        }
+        
+        .financial-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 22px;
+            margin-top: 10px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(46, 204, 113, 0.5);
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 30px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            opacity: 0.5;
+        }
+        
+        .highlight {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+        
+        @media print {
+            .slide {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide slide-cover">
+        <h1>SIM IS REAL</h1>
+        <div class="tagline">"Full Paddock"</div>
+        <div style="font-size: 24px; opacity: 0.8; margin: 20px 0;">
+            La Prima Piattaforma Social per Sim Racing<br>
+            con Montepremi Reali
+        </div>
+        <div class="subtitle">
+            Investor Pitch Deck - Novembre 2025<br>
+            Seed Round: €150,000
+        </div>
+    </div>
+
+    <!-- SLIDE 2: IL PROBLEMA -->
+    <div class="slide">
+        <h2>Il Problema</h2>
+        <div class="content-grid">
+            <div class="stat-box">
+                <span class="number">$1.5B</span>
+                <span class="label">Mercato Sim Racing 2025</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">2M+</span>
+                <span class="label">Sim Racers Enthusiast</span>
+            </div>
+        </div>
+        <h3 style="margin-top: 60px;">Ma il Mercato è Frammentato:</h3>
+        <ul class="bullet-list">
+            <li>iRacing/GT Sport: Solo competizioni, zero aspetto social</li>
+            <li>Discord/Forum: Community disperse, nessuna monetizzazione</li>
+            <li>Nessuna piattaforma permette montepremi reali strutturati</li>
+            <li>Gestione team complessa e manuale</li>
+        </ul>
+    </div>
+
+    <!-- SLIDE 3: LA SOLUZIONE -->
+    <div class="slide">
+        <h2>La Nostra Soluzione</h2>
+        <div class="content-grid">
+            <div class="content-box">
+                <h4>🎮 Competizioni</h4>
+                <p>Iscrizioni a pagamento (€10-50) con montepremi automatici distribuiti ai vincitori</p>
+            </div>
+            <div class="content-box">
+                <h4>👥 Social Network</h4>
+                <p>Feed attività, profili piloti, statistiche avanzate, sistema like/commenti</p>
+            </div>
+            <div class="content-box">
+                <h4>🏆 Gestione Team</h4>
+                <p>Dashboard manager, votazioni democratiche, proposte gare, forum riservato</p>
+            </div>
+            <div class="content-box">
+                <h4>💰 Montepremi Reali</h4>
+                <p>Pagamenti Stripe automatici, escrow sicuro, fee 15% solo su transazioni</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 60px; font-size: 28px; font-weight: 600;">
+            <span class="highlight">All-in-One Platform</span> per il Sim Racing Competitivo
+        </div>
+    </div>
+
+    <!-- SLIDE 4: COMPETITOR ANALYSIS -->
+    <div class="slide">
+        <h2>Analisi Competitor</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Piattaforma</th>
+                    <th>Montepremi</th>
+                    <th>Social</th>
+                    <th>Team Mgmt</th>
+                    <th>Debolezza</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>iRacing</strong></td>
+                    <td class="no">❌ No</td>
+                    <td>⚠️ Limitato</td>
+                    <td>⚠️ Base</td>
+                    <td>Zero montepremi, UX datata</td>
+                </tr>
+                <tr>
+                    <td><strong>GT Sport</strong></td>
+                    <td class="no">❌ No</td>
+                    <td>⚠️ Limitato</td>
+                    <td class="no">❌ No</td>
+                    <td>Chiuso in-game, no cross-platform</td>
+                </tr>
+                <tr>
+                    <td><strong>Discord</strong></td>
+                    <td>⚠️ Manuale</td>
+                    <td class="yes">✅ Si</td>
+                    <td>⚠️ Manuale</td>
+                    <td>Disperso, no automazione</td>
+                </tr>
+                <tr style="background: rgba(231, 76, 60, 0.1);">
+                    <td><strong>SIM IS REAL</strong></td>
+                    <td class="yes">✅ Automatico</td>
+                    <td class="yes">✅ Completo</td>
+                    <td class="yes">✅ Avanzato</td>
+                    <td><strong>First Mover! 🏁</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SLIDE 5: MODELLO DI BUSINESS -->
+    <div class="slide">
+        <h2>Modello di Business</h2>
+        <div class="content-grid">
+            <div class="content-box">
+                <h4>1. Platform Fee (60%)</h4>
+                <p><strong>15% su ogni montepremi</strong></p>
+                <p style="margin-top: 10px;">Gara 24 piloti × €10 = €240<br>
+                Fee piattaforma = <strong>€36</strong></p>
+            </div>
+            <div class="content-box">
+                <h4>2. Team Subscription (25%)</h4>
+                <p><strong>€29/mese per team</strong></p>
+                <p style="margin-top: 10px;">Dashboard avanzata, statistiche illimitate, branding, priority support</p>
+            </div>
+            <div class="content-box">
+                <h4>3. Premium Features (10%)</h4>
+                <p><strong>€4.99/mese per pilota</strong></p>
+                <p style="margin-top: 10px;">Telemetria, replay on-demand, training AI, badge esclusivi</p>
+            </div>
+            <div class="content-box">
+                <h4>4. Sponsorships (5%)</h4>
+                <p><strong>€500-5,000/mese</strong></p>
+                <p style="margin-top: 10px;">Banner, sponsored races, brand partnerships (Logitech, Fanatec)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: TRACTION -->
+    <div class="slide">
+        <h2>Traction & Validazione</h2>
+        <div class="content-grid">
+            <div class="stat-box">
+                <span class="number">50</span>
+                <span class="label">Piloti Team Lion Attivi</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">68</span>
+                <span class="label">Gare Completate</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">€1,240</span>
+                <span class="label">Montepremi Distribuiti</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">9</span>
+                <span class="label">Team Interessati</span>
+            </div>
+        </div>
+        <h3 style="margin-top: 60px;">Proof of Concept Validato ✅</h3>
+        <ul class="bullet-list">
+            <li>Community Discord attiva (200+ membri)</li>
+            <li>Organizzazione manuale gare funzionante</li>
+            <li>Demand confermato da altri team</li>
+            <li>Team Lion Motorsport case study di successo</li>
+        </ul>
+    </div>
+
+    <!-- SLIDE 7: ROADMAP -->
+    <div class="slide">
+        <h2>Roadmap Prodotto</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>Fase 1: MVP (Mesi 1-3)</h4>
+                <p><strong>Goal:</strong> Beta funzionante con 5 team, 250 piloti<br>
+                <strong>Features:</strong> Auth, gare, pagamenti Stripe, profili, classifica, admin panel</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Fase 2: Social & Teams (Mesi 4-6)</h4>
+                <p><strong>Goal:</strong> 20 team, 1,000 piloti, €8K MRR<br>
+                <strong>Features:</strong> Feed attività, dashboard team, votazioni, notifiche push, ricerca</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Fase 3: Advanced (Mesi 7-9)</h4>
+                <p><strong>Goal:</strong> 35 team, 3,000 piloti, €15K MRR<br>
+                <strong>Features:</strong> Telemetria GT7, streaming, mobile app, AI highlights</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Fase 4: Scale (Mesi 10-12)</h4>
+                <p><strong>Goal:</strong> 50 team, 5,000 piloti, €22K MRR, Break-even ✅<br>
+                <strong>Features:</strong> Multi-lingua, API pubblica, white-label, partnerships</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: PROIEZIONI FINANZIARIE -->
+    <div class="slide">
+        <h2>Proiezioni Finanziarie (3 Anni)</h2>
+        <div class="financial-box">
+            <h4>Anno 1 - Launch Year</h4>
+            <div class="financial-row">
+                <span>Revenue</span>
+                <span>€180,000</span>
+            </div>
+            <div class="financial-row">
+                <span>Costs</span>
+                <span>€110,000</span>
+            </div>
+            <div class="financial-row">
+                <span>Net Profit</span>
+                <span class="highlight">+€70,000</span>
+            </div>
+        </div>
+        <div class="financial-box" style="background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1)); border-color: rgba(52, 152, 219, 0.3);">
+            <h4 style="color: #3498db;">Anno 2 - Scale Year</h4>
+            <div class="financial-row">
+                <span>Revenue</span>
+                <span>€720,000</span>
+            </div>
+            <div class="financial-row">
+                <span>Costs</span>
+                <span>€300,000</span>
+            </div>
+            <div class="financial-row">
+                <span>Net Profit</span>
+                <span style="color: #3498db;">+€420,000</span>
+            </div>
+        </div>
+        <div class="financial-box">
+            <h4>Anno 3 - Profitability</h4>
+            <div class="financial-row">
+                <span>Revenue</span>
+                <span>€2,160,000</span>
+            </div>
+            <div class="financial-row">
+                <span>Costs</span>
+                <span>€720,000</span>
+            </div>
+            <div class="financial-row">
+                <span>Net Profit</span>
+                <span class="highlight">+€1,440,000</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: UNIT ECONOMICS -->
+    <div class="slide">
+        <h2>Unit Economics</h2>
+        <div class="content-grid">
+            <div class="stat-box">
+                <span class="number">€25</span>
+                <span class="label">Customer Acquisition Cost</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">€130</span>
+                <span class="label">Lifetime Value</span>
+            </div>
+            <div class="stat-box" style="grid-column: 1 / -1;">
+                <span class="number">5.2x</span>
+                <span class="label">LTV/CAC Ratio (Target: >3x ✅)</span>
+            </div>
+        </div>
+        <h3 style="margin-top: 60px;">Metriche Chiave:</h3>
+        <ul class="bullet-list">
+            <li>Pilota medio attivo: <strong>18 mesi</strong></li>
+            <li>Gare/mese: <strong>4</strong></li>
+            <li>Churn rate target: <strong>&lt;5%/mese</strong></li>
+            <li>Retention: <strong>&gt;95%</strong></li>
+        </ul>
+    </div>
+
+    <!-- SLIDE 10: INVESTIMENTO -->
+    <div class="slide">
+        <h2>Investment Ask</h2>
+        <div class="stat-box" style="max-width: 600px; margin: 40px auto;">
+            <span class="number">€150,000</span>
+            <span class="label">Seed Round</span>
+        </div>
+        <div class="content-grid" style="margin-top: 60px;">
+            <div class="content-box">
+                <h4>Equity Offerta</h4>
+                <p style="font-size: 32px; font-weight: 700; color: #e74c3c; margin-top: 20px;">15-20%</p>
+            </div>
+            <div class="content-box">
+                <h4>Post-Money Valuation</h4>
+                <p style="font-size: 32px; font-weight: 700; color: #e74c3c; margin-top: 20px;">€900K - €1.15M</p>
+            </div>
+        </div>
+        <h3 style="margin-top: 60px;">Use of Funds (18 mesi runway):</h3>
+        <div class="financial-box" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div class="financial-row">
+                <span>Development (CTO, devs, designers)</span>
+                <span>€60,000 (40%)</span>
+            </div>
+            <div class="financial-row">
+                <span>Marketing & Acquisition</span>
+                <span>€45,000 (30%)</span>
+            </div>
+            <div class="financial-row">
+                <span>Legal & Compliance</span>
+                <span>€15,000 (10%)</span>
+            </div>
+            <div class="financial-row">
+                <span>Operations</span>
+                <span>€30,000 (20%)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: RETURN ON INVESTMENT -->
+    <div class="slide">
+        <h2>Return on Investment</h2>
+        <div class="content-grid">
+            <div class="content-box" style="background: linear-gradient(135deg, rgba(46, 204, 113, 0.15), rgba(39, 174, 96, 0.1)); border-color: rgba(46, 204, 113, 0.4);">
+                <h4 style="color: #2ecc71;">Scenario Base</h4>
+                <p style="margin: 20px 0;"><strong>Acquisizione Anno 4 @ €15M</strong></p>
+                <div style="font-size: 48px; font-weight: 900; color: #2ecc71; margin: 30px 0;">15x ROI</div>
+                <p>IRR: 96%<br>Exit value: €2.25M</p>
+            </div>
+            <div class="content-box" style="background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(41, 128, 185, 0.1)); border-color: rgba(52, 152, 219, 0.4);">
+                <h4 style="color: #3498db;">Scenario Ottimistico</h4>
+                <p style="margin: 20px 0;"><strong>Acquisizione Anno 3 @ €25M</strong></p>
+                <div style="font-size: 48px; font-weight: 900; color: #3498db; margin: 30px 0;">25x ROI</div>
+                <p>IRR: 170%<br>Exit value: €3.75M</p>
+            </div>
+        </div>
+        <h3 style="margin-top: 60px;">Potenziali Acquirer:</h3>
+        <ul class="bullet-list">
+            <li>Codemasters / EA Sports</li>
+            <li>Polyphony Digital / Sony</li>
+            <li>Turn 10 / Microsoft</li>
+            <li>Epic Games, Valve</li>
+        </ul>
+    </div>
+
+    <!-- SLIDE 12: TEAM -->
+    <div class="slide">
+        <h2>Team</h2>
+        <div class="content-box" style="max-width: 800px; margin: 40px auto;">
+            <h4>Riccardo Asti - CEO & Founder</h4>
+            <p style="line-height: 1.8; margin-top: 20px;">
+                • Purchasing Manager Carlsberg (21 ristoranti Milano)<br>
+                • Co-founder ADF&R CDV Agency Milano<br>
+                • 15+ anni experience graphic design, video production, art direction<br>
+                • Founder Team Lion Motorsport (50 piloti, 68 gare, €1,240 montepremi)<br>
+                • <strong>Expertise:</strong> Operations, community management, motorsport
+            </p>
+        </div>
+        <h3 style="margin-top: 60px;">Team da Assumere (Seed):</h3>
+        <ul class="bullet-list">
+            <li><strong>CTO / Lead Developer</strong> - 5+ anni React/Firebase/Payments (€40K + 10% equity)</li>
+            <li><strong>Designer UI/UX</strong> - Part-time iniziale, full-time da Mese 6</li>
+            <li><strong>Community Manager</strong> - Da Mese 7 per gestione crescita</li>
+        </ul>
+    </div>
+
+    <!-- SLIDE 13: MILESTONES -->
+    <div class="slide">
+        <h2>Milestones Chiave</h2>
+        <div class="timeline">
+            <div class="timeline-item" style="border-color: #2ecc71;">
+                <h4 style="color: #2ecc71;">Mese 3 ✅</h4>
+                <p>Beta live con 5 team • 250 piloti • 60+ gare • NPS >50</p>
+            </div>
+            <div class="timeline-item" style="border-color: #3498db;">
+                <h4 style="color: #3498db;">Mese 6 🎯</h4>
+                <p>20 team attivi • 1,000 piloti • 200 gare/mese • €8,000 MRR</p>
+            </div>
+            <div class="timeline-item" style="border-color: #9b59b6;">
+                <h4 style="color: #9b59b6;">Mese 12 🚀</h4>
+                <p>50 team • 5,000 piloti • 500 gare/mese • €22,000 MRR • <strong>Break-even</strong></p>
+            </div>
+            <div class="timeline-item" style="border-color: #e74c3c;">
+                <h4 style="color: #e74c3c;">Mese 18 💰</h4>
+                <p>Serie A ready • 10,000+ piloti • €50,000+ MRR • Raise €500K-1M</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 14: WHY NOW -->
+    <div class="slide">
+        <h2>Why Now?</h2>
+        <div class="content-grid">
+            <div class="content-box">
+                <h4>📈 Mercato in Crescita</h4>
+                <p>Sim racing +25% dal 2023. eSports mainstream. Hardware accessibile (volanti €200-500).</p>
+            </div>
+            <div class="content-box">
+                <h4>🎮 Tech Maturity</h4>
+                <p>Stripe Connect, Firebase, React Native rendono facile build piattaforma payment + social.</p>
+            </div>
+            <div class="content-box">
+                <h4>👥 Community Ready</h4>
+                <p>Discord/Reddit communities vogliono soluzione unificata. Team Lion dimostra demand.</p>
+            </div>
+            <div class="content-box">
+                <h4>🏁 First Mover</h4>
+                <p>Zero competitor con montepremi automatici. 12-18 mesi lead time su copycat.</p>
+            </div>
+        </div>
+        <h3 style="margin-top: 60px; text-align: center; font-size: 36px;">
+            Il Timing È <span class="highlight">PERFETTO</span> 🚀
+        </h3>
+    </div>
+
+    <!-- SLIDE 15: CLOSING -->
+    <div class="slide slide-cover">
+        <h1 style="font-size: 64px;">Costruiamo Insieme</h1>
+        <div class="tagline" style="font-size: 28px;">Il Futuro del Sim Racing Competitivo</div>
+        <div style="margin: 60px 0; font-size: 20px; line-height: 1.8;">
+            <strong>Riccardo Asti</strong><br>
+            Founder & CEO<br>
+            📧 riccardo.asti@gmail.com<br>
+            🌐 simisreal.gg (coming soon)
+        </div>
+        <div style="font-size: 32px; font-weight: 700; color: #e74c3c; margin-top: 80px;">
+            Grazie! 🏁
+        </div>
+        <div class="subtitle">
+            SIM IS REAL "Full Paddock" - €150,000 Seed Round
+        </div>
+    </div>
+
+    <script>
+        // Per stampa PDF con Chrome: Ctrl+P → Salva come PDF
+        // Impostazioni consigliate: Layout Orizzontale, Margini Minimi
+    </script>
+</body>
+</html>

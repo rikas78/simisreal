@@ -1,99 +1,47 @@
-import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Coins, ArrowUpRight, ArrowDownLeft, ShieldCheck, AlertTriangle, Clock, ChevronRight } from 'lucide-react';
+import { Coins, ArrowUpRight, ArrowDownLeft, ShieldCheck, Clock, ChevronRight, TrendingUp, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import WalletBalanceCard from '@/components/wallet/WalletBalanceCard';
-import WalletRecentTx from '@/components/wallet/WalletRecentTx';
-import { getKycStatusLabel, getKycStatusColor, canWithdraw, WELCOME_BONUS_GW, WELCOME_BONUS_DAYS, formatGW } from '@/lib/walletUtils';
-import { toast } from 'sonner';
-import { addDays, format } from 'date-fns';
-import { it } from 'date-fns/locale';
+
+// DEMO DATA — nessun backend richiesto
+const DEMO_WALLET = {
+  gw_disponibili: 3_750_000,
+  gw_bonus: 750_000,
+  gw_bloccati: 1_000_000,
+  bonus_expires_at: '2026-06-04T00:00:00Z',
+};
+
+const DEMO_TRANSACTIONS = [
+  { id: 1, type: 'prize',        causale: '1° posto — Monza Sprint Race',         amount: 2_000_000,  created_date: '2026-04-28' },
+  { id: 2, type: 'welcome_bonus',causale: 'Bonus benvenuto S.R.F.',                amount: 750_000,    created_date: '2026-04-20' },
+  { id: 3, type: 'deposit',      causale: 'Ricarica wallet — €25,00',              amount: 1_000_000,  created_date: '2026-04-18' },
+  { id: 4, type: 'freeze',       causale: 'Escrow gara — Spa Endurance',           amount: -1_000_000, created_date: '2026-04-15' },
+  { id: 5, type: 'fee',          causale: 'Iscrizione — Red Bull Ring Time Attack', amount: -200_000,   created_date: '2026-04-10' },
+];
+
+const gwToEur = (gw) => ((gw / 100_000) * 2.5).toFixed(2);
+const formatGW = (gw) => (gw >= 1_000_000
+  ? (gw / 1_000_000).toFixed(1) + 'M GW'
+  : (gw / 1_000).toFixed(0) + 'K GW');
+
+const TX_LABELS = {
+  prize:         { label: 'Premio gara',    color: 'text-green-400' },
+  welcome_bonus: { label: 'Bonus S.R.F.',   color: 'text-accent' },
+  deposit:       { label: 'Ricarica',       color: 'text-blue-400' },
+  freeze:        { label: 'Escrow',         color: 'text-orange-400' },
+  fee:           { label: 'Iscrizione',     color: 'text-muted-foreground' },
+  withdrawal:    { label: 'Prelievo',       color: 'text-red-400' },
+};
 
 export default function Wallet() {
-  const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
-  const { data: pilots = [] } = useQuery({ queryKey: ['pilots'], queryFn: () => base44.entities.Pilot.list() });
-  const myPilot = pilots.find(p => p.created_by === user?.email);
-
-  const { data: wallets = [] } = useQuery({
-    queryKey: ['wallet', myPilot?.id],
-    queryFn: () => base44.entities.Wallet.filter({ user_id: user?.id }),
-    enabled: !!user?.id,
-  });
-  const wallet = wallets[0];
-
-  const { data: transactions = [] } = useQuery({
-    queryKey: ['wallet-tx', wallet?.id],
-    queryFn: () => base44.entities.WalletTransaction.filter({ wallet_id: wallet.id }, '-created_date', 10),
-    enabled: !!wallet?.id,
-  });
-
-  const { data: disputes = [] } = useQuery({
-    queryKey: ['complaints'],
-    queryFn: () => base44.entities.Complaint.filter({ submitted_by: myPilot?.username }),
-    enabled: !!myPilot?.username,
-  });
-  const activeFreezes = disputes.some(d => d.status === 'reviewing');
-
-  // Create wallet + welcome bonus on first visit
-  const createWallet = useMutation({
-    mutationFn: async () => {
-      const now = new Date();
-      const expiresAt = addDays(now, WELCOME_BONUS_DAYS).toISOString();
-      const w = await base44.entities.Wallet.create({
-        user_id: user.id,
-        pilot_id: myPilot?.id,
-        gw_disponibili: 0,
-        gw_bonus: WELCOME_BONUS_GW,
-        gw_bloccati: 0,
-        bonus_expires_at: expiresAt,
-        last_updated: now.toISOString(),
-      });
-      await base44.entities.WalletTransaction.create({
-        wallet_id: w.id,
-        user_id: user.id,
-        type: 'welcome_bonus',
-        amount: WELCOME_BONUS_GW,
-        causale: 'Bonus di benvenuto S.R.F. (scadenza 60 giorni)',
-        balance_disponibili_after: 0,
-        balance_bonus_after: WELCOME_BONUS_GW,
-        balance_bloccati_after: 0,
-        reference_type: 'system',
-        status: 'completed',
-      });
-      // Update pilot wallet_id
-      if (myPilot?.id) {
-        await base44.entities.Pilot.update(myPilot.id, { wallet_id: w.id });
-      }
-      return w;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['pilots'] });
-      toast.success(`Wallet creato! Ricevuti ${formatGW(WELCOME_BONUS_GW)} di benvenuto.`);
-    },
-  });
-
-  const kyc_status = myPilot?.kyc_status || 'not_started';
-  const { allowed: canW, reasons: blockReasons } = canWithdraw(wallet, kyc_status, activeFreezes);
-
-  if (!myPilot) {
-    return (
-      <div className="max-w-lg mx-auto py-20 text-center">
-        <Coins className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-        <p className="text-foreground font-semibold">Crea prima il tuo profilo pilota</p>
-        <p className="text-sm text-muted-foreground mt-1">Vai al Profilo per completare la registrazione</p>
-        <Link to="/profile"><Button className="mt-4 bg-primary text-primary-foreground">Vai al Profilo</Button></Link>
-      </div>
-    );
-  }
+  const w = DEMO_WALLET;
+  const totalGW = w.gw_disponibili + w.gw_bonus + w.gw_bloccati;
 
   return (
     <div className="space-y-6 max-w-3xl">
+
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-heading text-2xl md:text-3xl text-foreground flex items-center gap-2">
@@ -101,94 +49,118 @@ export default function Wallet() {
           </h1>
           <p className="text-muted-foreground text-sm mt-1">Golden Wheels — Valuta ufficiale S.R.F.</p>
         </div>
-        {/* KYC status badge */}
-        <Badge variant="outline" className={getKycStatusColor(kyc_status)}>
-          <ShieldCheck className="w-3 h-3 mr-1" />
-          KYC: {getKycStatusLabel(kyc_status)}
+        <Badge variant="outline" className="border-green-500/40 text-green-400">
+          <ShieldCheck className="w-3 h-3 mr-1" /> KYC: Verificato
         </Badge>
       </div>
 
-      {/* No wallet yet */}
-      {!wallet ? (
-        <div className="racing-card bg-card p-8 text-center space-y-4">
-          <Coins className="w-12 h-12 text-primary/40 mx-auto" />
-          <div>
-            <p className="font-heading text-lg text-foreground">Attiva il tuo Wallet</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Ricevi subito <span className="text-accent font-bold">750.000 GW</span> di benvenuto (≈ €18,75)
-            </p>
-          </div>
-          <Button onClick={() => createWallet.mutate()} disabled={createWallet.isPending} className="bg-primary text-primary-foreground">
-            {createWallet.isPending ? 'Attivazione...' : 'Attiva Wallet — Ricevi Bonus'}
-          </Button>
+      {/* Demo banner */}
+      <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-primary/30 bg-primary/5">
+        <TrendingUp className="w-4 h-4 text-primary flex-shrink-0" />
+        <p className="text-sm text-primary font-medium">
+          Modalità Demo — dati simulati per presentazione S.R.F. · 100.000 GW = €2,50
+        </p>
+      </div>
+
+      {/* Bonus expiry */}
+      <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-accent/30 bg-accent/5">
+        <Clock className="w-4 h-4 text-accent flex-shrink-0" />
+        <p className="text-sm text-accent">
+          I tuoi <strong>{formatGW(w.gw_bonus)}</strong> GW Bonus scadono il <strong>4 giugno 2026</strong>
+        </p>
+      </div>
+
+      {/* 3 saldi */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Disponibili */}
+        <div className="racing-card bg-card p-5 space-y-2 border border-green-500/20">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">GW Disponibili</p>
+          <p className="font-heading text-2xl text-green-400">{formatGW(w.gw_disponibili)}</p>
+          <p className="text-xs text-muted-foreground">≈ €{gwToEur(w.gw_disponibili)}</p>
+          <p className="text-[10px] text-green-400/60 uppercase tracking-wide">Prelevabili ✓</p>
         </div>
-      ) : (
-        <>
-          {/* Bonus expiry warning */}
-          {wallet.bonus_expires_at && (wallet.gw_bonus || 0) > 0 && (
-            <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-accent/30 bg-accent/5">
-              <Clock className="w-4 h-4 text-accent flex-shrink-0" />
-              <p className="text-sm text-accent">
-                I tuoi GW Bonus scadono il <strong>{format(new Date(wallet.bonus_expires_at), 'd MMMM yyyy', { locale: it })}</strong>
-              </p>
-            </div>
-          )}
+        {/* Bonus */}
+        <div className="racing-card bg-card p-5 space-y-2 border border-accent/20">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">GW Bonus</p>
+          <p className="font-heading text-2xl text-accent">{formatGW(w.gw_bonus)}</p>
+          <p className="text-xs text-muted-foreground">≈ €{gwToEur(w.gw_bonus)}</p>
+          <p className="text-[10px] text-accent/60 uppercase tracking-wide">Solo in-platform · scad. 60gg</p>
+        </div>
+        {/* Bloccati */}
+        <div className="racing-card bg-card p-5 space-y-2 border border-orange-500/20">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">GW Bloccati</p>
+          <p className="font-heading text-2xl text-orange-400">{formatGW(w.gw_bloccati)}</p>
+          <p className="text-xs text-muted-foreground">≈ €{gwToEur(w.gw_bloccati)}</p>
+          <p className="text-[10px] text-orange-400/60 uppercase tracking-wide flex items-center gap-1"><Lock className="w-3 h-3" /> Escrow gara attiva</p>
+        </div>
+      </div>
 
-          {/* Balances */}
-          <WalletBalanceCard wallet={wallet} />
+      {/* Totale */}
+      <div className="racing-card bg-card px-5 py-4 flex items-center justify-between">
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Totale wallet</p>
+          <p className="font-heading text-xl text-foreground">{formatGW(totalGW)}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Controvalore</p>
+          <p className="font-heading text-xl text-primary">€ {gwToEur(totalGW)}</p>
+        </div>
+      </div>
 
-          {/* CTAs */}
-          <div className="grid grid-cols-2 gap-3">
-            <Link to="/wallet/ricarica">
-              <Button className="w-full bg-primary text-primary-foreground h-11">
-                <ArrowDownLeft className="w-4 h-4 mr-2" /> Ricarica
-              </Button>
-            </Link>
-            <Link to="/wallet/prelievo">
-              <Button variant="outline" className={`w-full h-11 ${!canW ? 'border-destructive/30 text-destructive' : 'border-primary/30 text-primary'}`}>
-                <ArrowUpRight className="w-4 h-4 mr-2" /> Prelievo
-              </Button>
-            </Link>
+      {/* CTAs */}
+      <div className="grid grid-cols-2 gap-3">
+        <Link to="/wallet/ricarica">
+          <Button className="w-full bg-primary text-primary-foreground h-11">
+            <ArrowDownLeft className="w-4 h-4 mr-2" /> Ricarica
+          </Button>
+        </Link>
+        <Link to="/wallet/prelievo">
+          <Button variant="outline" className="w-full h-11 border-primary/30 text-primary">
+            <ArrowUpRight className="w-4 h-4 mr-2" /> Prelievo
+          </Button>
+        </Link>
+      </div>
+
+      {/* KYC completato */}
+      <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-green-500/20 bg-green-500/5">
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="w-5 h-5 text-green-400" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">Identità verificata KYC</p>
+            <p className="text-xs text-muted-foreground">Prelievi e gare con premio reale abilitati</p>
           </div>
+        </div>
+        <Badge className="bg-green-500/20 text-green-400 border-0">✓ Approvato</Badge>
+      </div>
 
-          {/* Withdrawal blocks */}
-          {!canW && (
-            <div className="space-y-2">
-              {blockReasons.map((r, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-destructive/20 bg-destructive/5">
-                  <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
-                  <p className="text-xs text-destructive">{r}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* KYC CTA */}
-          {kyc_status !== 'approved' && (
-            <Link to="/kyc" className="block">
-              <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-accent/30 bg-accent/5 hover:bg-accent/10 transition-colors">
+      {/* Movimenti recenti */}
+      <div className="racing-card bg-card overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Movimenti Recenti</h3>
+          <Link to="/wallet/movimenti" className="text-xs text-primary hover:underline">Vedi tutti →</Link>
+        </div>
+        <div className="divide-y divide-border">
+          {DEMO_TRANSACTIONS.map(tx => {
+            const meta = TX_LABELS[tx.type] || { label: tx.type, color: 'text-foreground' };
+            const positive = tx.amount > 0;
+            return (
+              <div key={tx.id} className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <ShieldCheck className="w-5 h-5 text-accent" />
+                  <div className={`w-2 h-2 rounded-full ${positive ? 'bg-green-400' : 'bg-red-400'}`} />
                   <div>
-                    <p className="text-sm font-semibold text-foreground">Completa la verifica KYC</p>
-                    <p className="text-xs text-muted-foreground">Necessario per prelievi e gare con premio reale</p>
+                    <p className="text-sm text-foreground font-medium">{tx.causale}</p>
+                    <p className={`text-xs ${meta.color}`}>{meta.label} · {tx.created_date}</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <span className={`text-sm font-bold font-heading ${positive ? 'text-green-400' : 'text-red-400'}`}>
+                  {positive ? '+' : ''}{formatGW(Math.abs(tx.amount))}
+                </span>
               </div>
-            </Link>
-          )}
+            );
+          })}
+        </div>
+      </div>
 
-          {/* Recent transactions */}
-          <div className="racing-card bg-card overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Movimenti Recenti</h3>
-              <Link to="/wallet/movimenti" className="text-xs text-primary hover:underline">Vedi tutti →</Link>
-            </div>
-            <WalletRecentTx transactions={transactions} />
-          </div>
-        </>
-      )}
     </div>
   );
 }

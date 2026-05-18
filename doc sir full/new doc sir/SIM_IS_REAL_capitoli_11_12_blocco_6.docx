@@ -1,0 +1,25 @@
+SIM IS REAL
+Documento Master Integrato
+Capitolo 11 — Rischi e mitigazioni
+
+Ogni progetto strutturato porta con sé una serie di rischi, e SIM IS REAL non fa eccezione. Il rischio principale è quello di costruire una piattaforma troppo ambiziosa rispetto alla capacità di lancio reale. Quando un sistema mette insieme identità, economia, team, eventi e contenuti, il pericolo non è solo tecnico ma anche strategico: il prodotto può diventare difficile da leggere, da spiegare e da adottare.
+
+Il rischio di mercato si manifesta se gli utenti non percepiscono subito il valore della piattaforma. Per evitarlo è necessario un posizionamento chiaro, una home leggibile e un onboarding semplice. Il primo contatto deve far capire in pochi secondi perché SIM IS REAL esiste e cosa offre. Se questo non accade, il progetto perde conversione già all’ingresso.
+
+Il rischio tecnico riguarda stabilità, integrazioni, coerenza dei dati e manutenzione. La mitigazione passa da sviluppo incrementale, test continui, separazione dei moduli e attenzione alle dipendenze. In un sistema con wallet, eventi, profili e telemetria, la qualità dell’infrastruttura è parte del prodotto, non un elemento secondario.
+
+Esistono poi rischi operativi e di governance. Se i ruoli non sono chiari, se le responsabilità si sovrappongono o se i processi non sono documentati, il progetto rallenta e aumenta il rischio di errore. Per questo la governance deve essere definita fin dall’inizio e aggiornata in modo coerente con la crescita del sistema.
+
+I rischi economici e reputazionali sono altrettanto importanti. Se i costi crescono troppo in fretta o se il regolamento appare poco chiaro, la fiducia nell’intero progetto può indebolirsi. La mitigazione è nella trasparenza, nella progressione per fasi e nella capacità di mantenere il messaggio allineato alla realtà del prodotto.
+
+Capitolo 12 — Struttura del sito e architettura informativa
+
+Il sito di SIM IS REAL non è una vetrina statica, ma l’interfaccia operativa della piattaforma. Deve permettere al driver di capire il progetto, registrarsi, consultare gli eventi, accedere alla propria area riservata e usare gli strumenti disponibili in modo rapido e coerente. La struttura informativa deve quindi essere semplice nella lettura ma solida nei flussi.
+
+La homepage ha il compito di spiegare la proposta di valore e di orientare l’utente verso il primo passo utile. Da lì il percorso si dirama verso il progetto, l’Academy, il calendario eventi, il repository legale e l’area autenticata. Ogni sezione deve avere una funzione chiara e non sovrapporsi alle altre.
+
+L’area pubblica serve a informare e convertire; l’area autenticata serve a operare. Nel primo caso il focus è la comprensione del progetto, nel secondo è l’esecuzione delle attività: profilo, wallet, telemetria, team, iscrizioni e marketplace. Questa distinzione è fondamentale per mantenere il sito leggibile e per far percepire subito il passaggio da semplice visitatore a driver attivo.
+
+La sitemap deve essere gerarchica e modulare. Le sezioni essenziali sono landing page, federazione, Academy, competizioni, marketplace, area legale e area autenticata con profilo, wallet, telemetria, scuderia e iscrizioni. La struttura deve essere sufficiente a supportare il presente ma anche flessibile per accogliere future espansioni.
+
+Il sito, in sintesi, deve riflettere il progetto: chiaro, ordinato, progressivo e credibile. Se la navigazione è confusa, anche la percezione del sistema si indebolisce; se è chiara, il progetto appare subito più solido e professionale.

@@ -1,375 +1,221 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Building2, Search, Users, Trophy, Plus, ChevronRight, Crown, Flag, Check, X, Send } from 'lucide-react';
+import { Building2, Search, Users, Trophy, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import CreateTeamModal from '@/components/teams/CreateTeamModal';
 import TeamManagerDashboard from '@/components/teams/TeamManagerDashboard';
 import TeamStats from '@/components/teams/TeamStats';
 
 const categoryColors = {
-  START: 'text-muted-foreground', ROOKIE: 'text-blue-400', AMATEUR: 'text-cyan-400',
-  'SEMI-PRO': 'text-accent', PRO: 'text-green-400', K: 'text-purple-400',
-};
-
-export import React, { useState, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Building2, Search, Users, Trophy, Plus, ChevronRight, Crown, Flag, Check, X, Send } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
-import CreateTeamModal from '@/components/teams/CreateTeamModal';
-import TeamManagerDashboard from '@/components/teams/TeamManagerDashboard';
-import TeamStats from '@/components/teams/TeamStats';
-
-const categoryColors = {
-  START: 'text-muted-foreground', ROOKIE: 'text-blue-400', AMATEUR: 'text-cyan-400',
-  'SEMI-PRO': 'text-accent', PRO: 'text-green-400', K: 'text-purple-400',
+  START: 'text-muted-foreground',
+  ROOKIE: 'text-blue-400',
+  AMATEUR: 'text-cyan-400',
+  'SEMI-PRO': 'text-accent',
+  PRO: 'text-green-400',
+  K: 'text-purple-400',
 };
 
 export default function Teams() {
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
-  const [showCreate, setShowCreate] = useState(false);
-  const [requestMsg, setRequestMsg] = useState('');
-  const [requestingTeam, setRequestingTeam] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
-  const { data: teams = [], isLoading } = useQuery({
+  const { data: teams = [], isLoading: teamsLoading } = useQuery({
     queryKey: ['teams'],
-    queryFn: () => base44.entities.Team.list('-total_points', 100),
+    queryFn: () => base44.entities.Team.list('-created_date'),
   });
+
   const { data: pilots = [] } = useQuery({
     queryKey: ['pilots'],
-    queryFn: () => base44.entities.Pilot.list('-total_points', 200),
-  });
-  const { data: teamRequests = [] } = useQuery({
-    queryKey: ['team-requests'],
-    queryFn: () => base44.entities.TeamRequest.list('-created_date', 100),
-  });
-  const { data: races = [] } = useQuery({
-    queryKey: ['races'],
-    queryFn: () => base44.entities.Race.list(),
+    queryFn: () => base44.entities.Pilot.list(),
   });
 
-  const myPilot = pilots.find(p => p.created_by === me?.email);
-  const myTeam = teams.find(t => t.id === myPilot?.team_id);
-  const isManager = myTeam?.manager_id === myPilot?.id;
-
-  const sendRequestMutation = useMutation({
-    mutationFn: (data) => base44.entities.TeamRequest.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['team-requests'] });
-      setRequestingTeam(null);
-      setRequestMsg('');
-      toast.success('Richiesta inviata!');
-    },
+  const { data: me } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
   });
 
-  const handleSendRequest = (team) => {
-    if (!myPilot) return toast.error('Crea prima il tuo profilo pilota');
-    const alreadySent = teamRequests.find(r => r.team_id === team.id && r.pilot_id === myPilot.id && r.status === 'pending');
-    if (alreadySent) return toast.error('Hai già una richiesta in attesa');
-    sendRequestMutation.mutate({
-      team_id: team.id,
-      team_name: team.name,
-      pilot_id: myPilot.id,
-      pilot_username: myPilot.username,
-      message: requestMsg,
+  const filteredTeams = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return teams;
+
+    return teams.filter((team) => {
+      const name = (team.name || '').toLowerCase();
+      const tag = (team.tag || '').toLowerCase();
+      const description = (team.description || '').toLowerCase();
+      return name.includes(q) || tag.includes(q) || description.includes(q);
     });
+  }, [teams, search]);
+
+  const myPilot = useMemo(() => {
+    if (!me?.email) return null;
+    return pilots.find((p) => p.email === me.email) || null;
+  }, [pilots, me]);
+
+  const myTeam = useMemo(() => {
+    if (!myPilot?.team_id) return null;
+    return teams.find((t) => t.id === myPilot.team_id) || null;
+  }, [teams, myPilot]);
+
+  const handleJoinRequest = (team) => {
+    toast.info(`Richiesta di ingresso a ${team.name || 'team'} non ancora collegata al backend`);
   };
 
-  // Build standings with pilots per team
-  const teamStandings = useMemo(() => {
-    return [...teams]
-      .map(team => {
-        const members = pilots.filter(p => p.team_id === team.id);
-        const totalPts = members.reduce((s, p) => s + (p.total_points || 0), 0);
-        return { ...team, members, computedPoints: totalPts };
-      })
-      .sort((a, b) => b.computedPoints - a.computedPoints);
-  }, [teams, pilots]);
-
-  const filtered = teamStandings.filter(t =>
-    !search || t.name?.toLowerCase().includes(search.toLowerCase()) || t.tag?.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-6 max-w-7xl">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="font-heading text-2xl md:text-3xl text-foreground">Scuderie</h1>
-          <p className="text-muted-foreground text-sm mt-1">{teams.length} scuderie registrate</p>
+          <h1 className="font-heading text-2xl md:text-3xl text-foreground flex items-center gap-2">
+            <Building2 className="w-7 h-7 text-primary" />
+            Teams
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Gestisci il tuo team, scopri le scuderie e confronta statistiche
+          </p>
         </div>
-        {!myPilot?.team_id && (
-          <Button onClick={() => setShowCreate(true)} className="bg-primary text-primary-foreground">
-            <Plus className="w-4 h-4 mr-2" />Fonda Scuderia
-          </Button>
-        )}
+
+        <Button onClick={() => setShowCreateModal(true)} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Crea team
+        </Button>
       </div>
 
-      <Tabs defaultValue={isManager ? 'dashboard' : 'standings'}>
-        <TabsList className="bg-card border border-border">
-          <TabsTrigger value="standings">Classifica</TabsTrigger>
-          <TabsTrigger value="stats">📊 Statistiche</TabsTrigger>
-          <TabsTrigger value="teams">Tutte le Scuderie</TabsTrigger>
-          {isManager && <TabsTrigger value="dashboard">Dashboard Manager</TabsTrigger>}
+      <Tabs defaultValue="directory" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="directory">Directory</TabsTrigger>
+          <TabsTrigger value="my-team">Il mio team</TabsTrigger>
+          <TabsTrigger value="stats">Statistiche</TabsTrigger>
         </TabsList>
 
-        {/* STANDINGS TAB */}
-        <TabsContent value="standings" className="mt-5">
-          <div className="racing-card bg-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    {['Pos','Scuderia','Manager','Piloti','Punti Totali'].map(h => (
-                      <th key={h} className="text-left text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-4 py-3">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {teamStandings.map((team, idx) => (
-                    <tr key={team.id} className={cn(
-                      "border-b border-border/40 hover:bg-secondary/10 transition-colors",
-                      myTeam?.id === team.id && "bg-primary/5 border-primary/20"
-                    )}>
-                      <td className="px-4 py-3">
-                        <span className={cn("font-heading text-sm",
-                          idx === 0 ? "text-accent" : idx === 1 ? "text-muted-foreground" : idx === 2 ? "text-orange-400" : "text-muted-foreground"
-                        )}>{idx + 1}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <span className="font-heading text-xs text-primary">{team.tag}</span>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-foreground">{team.name}</p>
-                            {myTeam?.id === team.id && <span className="text-[10px] text-primary">(la tua scuderia)</span>}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">{team.manager_username || '—'}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1 flex-wrap">
-                          {team.members.slice(0,4).map(m => (
-                            <span key={m.id} className="text-[10px] px-1.5 py-0.5 bg-secondary rounded text-foreground">{m.username}</span>
-                          ))}
-                          {team.members.length > 4 && <span className="text-[10px] text-muted-foreground">+{team.members.length - 4}</span>}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-heading text-base text-primary">{team.computedPoints}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <TabsContent value="directory" className="space-y-4 mt-4">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Cerca team per nome, tag o descrizione..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
+          {teamsLoading ? (
+            <div className="racing-card bg-card p-6 text-sm text-muted-foreground">
+              Caricamento team...
             </div>
-          </div>
-        </TabsContent>
-
-        {/* TEAMS LIST TAB */}
-        <TabsContent value="teams" className="mt-5">
-          <div className="relative max-w-md mb-5">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cerca scuderia..." className="pl-10 bg-card border-border" />
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {[1,2,3].map(i => <div key={i} className="racing-card bg-card h-48 animate-pulse" />)}
+          ) : filteredTeams.length === 0 ? (
+            <div className="racing-card bg-card p-6 text-sm text-muted-foreground">
+              Nessun team trovato.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filtered.map(team => (
-                <div key={team.id} className="racing-card bg-card p-5 hover:glow-primary transition-all">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="font-heading text-sm text-primary">{team.tag}</span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-heading text-base text-foreground truncate">{team.name}</p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Crown className="w-3 h-3" />{team.manager_username || 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                  {team.description && <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{team.description}</p>}
-                  <div className="flex gap-2 flex-wrap mb-3">
-                    {team.members.slice(0, 3).map(m => (
-                      <span key={m.id} className="text-[10px] px-2 py-0.5 bg-secondary rounded-full text-foreground">{m.username}</span>
-                    ))}
-                    {team.members.length > 3 && <span className="text-[10px] text-muted-foreground self-center">+{team.members.length - 3}</span>}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border/50 mb-3">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span className="text-sm">{team.member_count || team.members.length || 1}</span>
-                      <span className="text-xs text-muted-foreground">membri</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-3.5 h-3.5 text-accent" />
-                      <span className="text-sm font-heading text-primary">{team.computedPoints}</span>
-                      <span className="text-xs text-muted-foreground">pts</span>
-                    </div>
-                  </div>
-                  {/* Request to join */}
-                  {myPilot && !myPilot.team_id && myTeam?.id !== team.id && (
-                    requestingTeam?.id === team.id ? (
-                      <div className="space-y-2">
-                        <Input
-                          value={requestMsg}
-                          onChange={e => setRequestMsg(e.target.value)}
-                          placeholder="Messaggio di presentazione..."
-                          className="text-xs bg-background border-border h-8"
-                        />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={() => handleSendRequest(team)} disabled={sendRequestMutation.isPending} className="bg-primary text-primary-foreground flex-1 h-7 text-xs">
-                            <Send className="w-3 h-3 mr-1" />Invia
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => setRequestingTeam(null)} className="h-7 text-xs">Annulla</Button>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              {filteredTeams.map((team) => {
+                const members = pilots.filter((p) => p.team_id === team.id);
+                const captain = members.find((p) => p.id === team.captain_id);
+
+                return (
+                  <div key={team.id} className="racing-card bg-card p-5 space-y-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-heading text-xl text-foreground">
+                            {team.name || 'Team senza nome'}
+                          </h3>
+                          {team.tag && (
+                            <Badge variant="outline" className="text-xs">
+                              {team.tag}
+                            </Badge>
+                          )}
                         </div>
+
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {team.description || 'Nessuna descrizione disponibile.'}
+                        </p>
                       </div>
-                    ) : (
-                      <Button size="sm" variant="outline" onClick={() => setRequestingTeam(team)} className="w-full h-7 text-xs border-primary/30 text-primary hover:bg-primary/10">
-                        Richiedi Accesso
+
+                      <Badge variant="outline" className="text-xs">
+                        {team.status || 'active'}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="rounded-lg border border-border p-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                          Membri
+                        </p>
+                        <p className="text-lg font-bold text-foreground flex items-center gap-2">
+                          <Users className="w-4 h-4 text-primary" />
+                          {members.length}
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg border border-border p-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                          Categoria top
+                        </p>
+                        <p className={cn('text-sm font-bold', categoryColors[team.category] || 'text-foreground')}>
+                          {team.category || 'N/D'}
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg border border-border p-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                          Captain
+                        </p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {captain?.full_name || 'Non assegnato'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Trophy className="w-4 h-4 text-primary" />
+                        Team ranking e palmarès in aggiornamento
+                      </div>
+
+                      <Button variant="outline" size="sm" onClick={() => handleJoinRequest(team)}>
+                        Richiedi ingresso
                       </Button>
-                    )
-                  )}
-                </div>
-              ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </TabsContent>
 
-        {/* STATS TAB */}
-        <TabsContent value="stats" className="mt-5">
-          <TeamStats teamStandings={teamStandings} />
+        <TabsContent value="my-team" className="mt-4">
+          {myTeam ? (
+            <TeamManagerDashboard team={myTeam} pilot={myPilot} />
+          ) : (
+            <div className="racing-card bg-card p-6 space-y-3">
+              <h3 className="font-heading text-lg text-foreground">Nessun team associato</h3>
+              <p className="text-sm text-muted-foreground">
+                Non fai ancora parte di un team oppure il profilo pilota non è collegato.
+              </p>
+              <Button onClick={() => setShowCreateModal(true)} className="gap-2">
+                <Plus className="w-4 h-4" />
+                Crea un team
+              </Button>
+            </div>
+          )}
         </TabsContent>
 
-        {/* MANAGER DASHBOARD */}
-        {isManager && (
-          <TabsContent value="dashboard" className="mt-5">
-            <TeamManagerDashboard team={myTeam} pilots={pilots} teamRequests={teamRequests} races={races} myPilot={myPilot} />
-          </TabsContent>
-        )}
+        <TabsContent value="stats" className="mt-4">
+          <TeamStats teams={teams} pilots={pilots} />
+        </TabsContent>
       </Tabs>
 
-      {showCreate && <CreateTeamModal onClose={() => setShowCreate(false)} myPilot={myPilot} />}
+      <CreateTeamModal
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+        currentPilot={myPilot}
+      />
     </div>
   );
-}default function Teams() {
-  const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
-  const [showCreate, setShowCreate] = useState(false);
-  const [requestMsg, setRequestMsg] = useState('');
-  const [requestingTeam, setRequestingTeam] = useState(null);
-
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
-  const { data: teams = [], isLoading } = useQuery({
-    queryKey: ['teams'],
-    queryFn: () => base44.entities.Team.list('-total_points', 100),
-  });
-  const { data: pilots = [] } = useQuery({
-    queryKey: ['pilots'],
-    queryFn: () => base44.entities.Pilot.list('-total_points', 200),
-  });
-  const { data: teamRequests = [] } = useQuery({
-    queryKey: ['team-requests'],
-    queryFn: () => base44.entities.TeamRequest.list('-created_date', 100),
-  });
-  const { data: races = [] } = useQuery({
-    queryKey: ['races'],
-    queryFn: () => base44.entities.Race.list(),
-  });
-
-  const myPilot = pilots.find(p => p.created_by === me?.email);
-  const myTeam = teams.find(t => t.id === myPilot?.team_id);
-  const isManager = myTeam?.manager_id === myPilot?.id;
-
-  const sendRequestMutation = useMutation({
-    mutationFn: (data) => base44.entities.TeamRequest.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['team-requests'] });
-      setRequestingTeam(null);
-      setRequestMsg('');
-      toast.success('Richiesta inviata!');
-    },
-  });
-
-  const handleSendRequest = (team) => {
-    if (!myPilot) return toast.error('Crea prima il tuo profilo pilota');
-    const alreadySent = teamRequests.find(r => r.team_id === team.id && r.pilot_id === myPilot.id && r.status === 'pending');
-    if (alreadySent) return toast.error('Hai già una richiesta in attesa');
-    sendRequestMutation.mutate({
-      team_id: team.id,
-      team_name: team.name,
-      pilot_id: myPilot.id,
-      pilot_username: myPilot.username,
-      message: requestMsg,
-    });
-  };
-
-  // Build standings with pilots per team
-  const teamStandings = useMemo(() => {
-    return [...teams]
-      .map(team => {
-        const members = pilots.filter(p => p.team_id === team.id);
-        const totalPts = members.reduce((s, p) => s + (p.total_points || 0), 0);
-        return { ...team, members, computedPoints: totalPts };
-      })
-      .sort((a, b) => b.computedPoints - a.computedPoints);
-  }, [teams, pilots]);
-
-  const filtered = teamStandings.filter(t =>
-    !search || t.name?.toLowerCase().includes(search.toLowerCase()) || t.tag?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="font-heading text-2xl md:text-3xl text-foreground">Scuderie</h1>
-          <p className="text-muted-foreground text-sm mt-1">{teams.length} scuderie registrate</p>
-        </div>
-        {!myPilot?.team_id && (
-          <Button onClick={() => setShowCreate(true)} className="bg-primary text-primary-foreground">
-            <Plus className="w-4 h-4 mr-2" />Fonda Scuderia
-          </Button>
-        )}
-      </div>
-
-      <Tabs defaultValue={isManager ? 'dashboard' : 'standings'}>
-        <TabsList className="bg-card border border-border">
-          <TabsTrigger value="standings">Classifica</TabsTrigger>
-          <TabsTrigger value="stats">📊 Statistiche</TabsTrigger>
-          <TabsTrigger value="teams">Tutte le Scuderie</TabsTrigger>
-          {isManager && <TabsTrigger value="dashboard">Dashboard Manager</TabsTrigger>}
-        </TabsList>
-
-        {/* STANDINGS TAB */}
-        <TabsContent value="standings" className="mt-5">
-          <div className="racing-card bg-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    {['Pos','Scuderia','Manager','Piloti','Punti Totali'].map(h => (
-                      <th key={h} className="text-left text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-4 py-3">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {teamStandings.map((team, idx) => (
- 
+}

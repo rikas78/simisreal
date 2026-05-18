@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-HUB Dev Academy 🚀</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#0F172A;color:#E2E8F0;line-height:1.6}
+  a{color:#818CF8}
+
+  /* LAYOUT */
+  .wrap{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+
+  /* HERO */
+  .hero{text-align:center;padding:48px 0 40px}
+  .hero-badge{display:inline-block;background:#4F46E5;color:#fff;padding:6px 18px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+  .hero h1{font-size:36px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:12px}
+  .hero h1 span{color:#818CF8}
+  .hero p{font-size:15px;color:#94A3B8;max-width:500px;margin:0 auto}
+  .progress-bar{background:#1E293B;border-radius:8px;height:8px;margin:32px 0 0;overflow:hidden}
+  .progress-fill{background:linear-gradient(90deg,#4F46E5,#818CF8);height:100%;width:0%;border-radius:8px;transition:width .5s}
+
+  /* MISSION CARD */
+  .mission{background:#1E293B;border-radius:16px;border:1px solid #334155;margin-bottom:24px;overflow:hidden}
+  .mission-hdr{padding:20px 24px;display:flex;align-items:center;gap:16px;cursor:pointer;user-select:none}
+  .mission-hdr:hover{background:#263348}
+  .lvl{background:#0F172A;border:1px solid #334155;border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .mission-meta{flex:1}
+  .mission-title{font-size:16px;font-weight:700;color:#F1F5F9;margin-bottom:2px}
+  .mission-sub{font-size:12px;color:#64748B;font-weight:500}
+  .mission-tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+  .tag-html{background:#7C3AED20;color:#A78BFA;border:1px solid #7C3AED40}
+  .tag-css{background:#0EA5E920;color:#38BDF8;border:1px solid #0EA5E940}
+  .tag-js{background:#F59E0B20;color:#FCD34D;border:1px solid #F59E0B40}
+  .tag-data{background:#10B98120;color:#34D399;border:1px solid #10B98140}
+  .tag-pro{background:#EF444420;color:#F87171;border:1px solid #EF444440}
+  .arrow{color:#475569;font-size:18px;transition:transform .2s;flex-shrink:0}
+  .mission.open .arrow{transform:rotate(90deg)}
+
+  /* MISSION BODY */
+  .mission-body{display:none;padding:0 24px 24px;flex-direction:column;gap:20px}
+  .mission.open .mission-body{display:flex}
+
+  /* SECTIONS */
+  .why-box{background:#0F172A;border-radius:10px;padding:14px 16px;border-left:3px solid #4F46E5}
+  .why-label{font-size:10px;font-weight:700;color:#818CF8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .why-text{font-size:14px;color:#CBD5E1;line-height:1.6}
+
+  .concept-box{background:#0F172A;border-radius:10px;padding:14px 16px;border-left:3px solid #10B981}
+  .concept-label{font-size:10px;font-weight:700;color:#34D399;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+
+  .step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .step:last-child{margin-bottom:0}
+  .step-num{background:#4F46E5;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+  .step-text{font-size:14px;color:#CBD5E1;line-height:1.6}
+  .step-text strong{color:#F1F5F9}
+
+  /* CODE BLOCK */
+  .code-wrap{background:#020617;border-radius:10px;overflow:hidden;border:1px solid #1E293B}
+  .code-header{background:#0F172A;padding:8px 14px;font-size:11px;color:#475569;font-weight:600;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1E293B}
+  .code-lang{color:#818CF8;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:10px}
+  .copy-btn{background:#1E293B;border:1px solid #334155;color:#94A3B8;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600}
+  .copy-btn:hover{background:#334155;color:#F1F5F9}
+  pre{padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:#E2E8F0}
+  .kw{color:#C084FC}  /* keyword */
+  .str{color:#86EFAC} /* string */
+  .fn{color:#67E8F9}  /* function */
+  .cm{color:#475569;font-style:italic}  /* comment */
+  .nm{color:#FCD34D}  /* number */
+  .pr{color:#FDA4AF}  /* property */
+
+  /* RESULT BOX */
+  .result-box{background:#0F172A;border-radius:10px;padding:14px 16px;border-left:3px solid #FBBF24}
+  .result-label{font-size:10px;font-weight:700;color:#FCD34D;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .result-text{font-size:14px;color:#CBD5E1}
+
+  /* CHALLENGE */
+  .challenge{background:#0F172A;border-radius:10px;padding:14px 16px;border:1px dashed #4F46E5}
+  .challenge-label{font-size:10px;font-weight:700;color:#818CF8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .challenge-text{font-size:14px;color:#CBD5E1}
+  .challenge-hint{font-size:12px;color:#475569;margin-top:6px;font-style:italic}
+
+  /* SECTION LABEL */
+  .slabel{font-size:13px;font-weight:700;color:#F1F5F9;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .slabel::after{content:'';flex:1;height:1px;background:#1E293B}
+
+  /* COMPLETE BTN */
+  .complete-btn{background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;align-self:flex-start}
+  .complete-btn:hover{background:#4338CA}
+  .complete-btn.done{background:#10B981}
+
+  /* VOCAB */
+  .vocab{display:flex;flex-wrap:wrap;gap:8px}
+  .vword{background:#1E293B;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px}
+  .vword strong{color:#818CF8}
+
+  /* DIVIDER */
+  hr{border:none;border-top:1px solid #1E293B;margin:8px 0}
+
+  /* FOOTER */
+  .footer{text-align:center;padding:32px 0 0;color:#334155;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">A-HUB Dev Academy</div>
+    <h1>Diventa il <span>Programmatore</span><br>della tua App 🚀</h1>
+    <p>8 missioni segrete. Ogni missione migliora A-HUB <strong>e</strong> ti insegna a programmare per davvero.</p>
+    <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+    <p style="font-size:12px;color:#475569;margin-top:8px" id="prog-text">0 / 8 missioni completate</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 1 -->
+  <div class="mission" id="m1">
+    <div class="mission-hdr" onclick="toggle(1)">
+      <div class="lvl">🏗️</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 1 — Cambia il Titolo dell'App</div>
+        <div class="mission-sub">Impari: HTML · Struttura di una pagina web · Tag</div>
+      </div>
+      <span class="mission-tag tag-html">HTML</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Vuoi cambiare il titolo della scheda del browser da "A-HUB | Alessio Business" a qualcosa di tuo. Tipo "RESELL KING 👑".</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: HTML</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">HTML è come lo <strong>scheletro</strong> di una pagina web. Ogni pezzo è avvolto in un <strong>tag</strong>, tipo: <code style="color:#818CF8">&lt;h1&gt;Titolo&lt;/h1&gt;</code></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">I tag si aprono <code style="color:#818CF8">&lt;tag&gt;</code> e si chiudono <code style="color:#818CF8">&lt;/tag&gt;</code>. Tutto il contenuto va in mezzo.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Il tag <code style="color:#818CF8">&lt;title&gt;</code> controlla il nome nella scheda del browser.</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Dove cercare nel file</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">HTML</span><span style="color:#475569">ahub-v5.html — riga 4</span></div>
+          <pre><span class="cm">&lt;!-- Trova questa riga --&gt;</span>
+<span class="kw">&lt;title&gt;</span>A-HUB | Alessio Business<span class="kw">&lt;/title&gt;</span>
+
+<span class="cm">&lt;!-- Cambiala in qualcosa di tuo, es: --&gt;</span>
+<span class="kw">&lt;title&gt;</span>RESELL KING 👑 | By Alessio<span class="kw">&lt;/title&gt;</span></pre>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">✅ Risultato</div>
+        <div class="result-text">Apri il file nel browser — la scheda in alto mostrerà il tuo nuovo titolo.</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Trova il tag <code style="color:#818CF8">&lt;h1&gt;</code> e <code style="color:#818CF8">&lt;h2&gt;</code> nel file. Cosa contengono?</div>
+        <div class="challenge-hint">Spoiler: i numeri dopo h (h1, h2, h3...) indicano l'importanza del titolo. h1 = più importante.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(1,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 2 -->
+  <div class="mission" id="m2">
+    <div class="mission-hdr" onclick="toggle(2)">
+      <div class="lvl">🎨</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 2 — Cambia il Colore dell'App</div>
+        <div class="mission-sub">Impari: CSS · Colori · Classi · Proprietà</div>
+      </div>
+      <span class="mission-tag tag-css">CSS</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Il viola/indigo di A-HUB è bello, ma tu vuoi il <strong>rosso</strong>. O il verde. O qualsiasi colore tu voglia — è il tuo brand!</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: CSS</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">CSS è lo <strong>stile</strong> della pagina. Se HTML è lo scheletro, CSS è i vestiti.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Si scrive così: <code style="color:#818CF8">proprietà: valore;</code> — tipo <code style="color:#818CF8">color: red;</code> o <code style="color:#818CF8">background: #FF0000;</code></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">I colori si scrivono in <strong>HEX</strong>: ogni colore è un codice con #. Es: <code style="color:#F87171">#EF4444</code> = rosso, <code style="color:#34D399">#10B981</code> = verde, <code style="color:#FCD34D">#F59E0B</code> = giallo.</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Come fare</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">CSS</span><span style="color:#475569">nel tag &lt;style&gt; in cima al file</span></div>
+          <pre><span class="cm">/* Cerca tutte le occorrenze di #4F46E5 */</span>
+<span class="cm">/* e sostituiscile con il tuo colore */</span>
+
+<span class="cm">/* Esempi di colori belli: */</span>
+<span class="pr">--rosso:</span>    <span class="str">#EF4444</span>;
+<span class="pr">--verde:</span>    <span class="str">#10B981</span>;
+<span class="pr">--arancio:</span>  <span class="str">#F97316</span>;
+<span class="pr">--rosa:</span>     <span class="str">#EC4899</span>;
+<span class="pr">--oro:</span>      <span class="str">#F59E0B</span>;</pre>
+        </div>
+      </div>
+
+      <div>
+        <div class="slabel">Sito utile</div>
+        <div style="background:#0F172A;border-radius:10px;padding:14px 16px;font-size:14px;color:#CBD5E1">
+          Vai su <a href="https://coolors.co" target="_blank">coolors.co</a> — genera palette di colori fantastici. Premi SPAZIO e scegli quello che ti piace 🎨
+        </div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Cambia anche il colore di sfondo dell'app. Cerca <code style="color:#818CF8">background:#F1F5F9</code> e mettilo più scuro, tipo <code style="color:#818CF8">#111827</code>.</div>
+        <div class="challenge-hint">Cosa succede? L'app diventa dark mode 🖤</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(2,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 3 -->
+  <div class="mission" id="m3">
+    <div class="mission-hdr" onclick="toggle(3)">
+      <div class="lvl">⚡</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 3 — Aggiungi una Categoria</div>
+        <div class="mission-sub">Impari: JavaScript · Variabili · Array</div>
+      </div>
+      <span class="mission-tag tag-js">JS</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Le categorie di A-HUB sono: Magliette, Felpe, Cappellini, Sneakers, Accessori. Vuoi aggiungere "Orologi ⌚" o "Borse 👜".</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: Variabili e Array</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">Una <strong>variabile</strong> è una scatola con un nome che contiene un valore. <code style="color:#818CF8">let nome = "Alessio";</code></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Un <strong>Array</strong> è una lista di cose: <code style="color:#818CF8">let lista = ["cosa1", "cosa2", "cosa3"];</code></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Per aggiungere un elemento si usa <code style="color:#818CF8">.push("nuovaCosa")</code> oppure si scrive direttamente nella lista.</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Dove cercare</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JavaScript</span><span style="color:#475569">nel tag &lt;script&gt; in fondo al file</span></div>
+          <pre><span class="cm">// Trova questa riga — è un Array di categorie</span>
+<span class="kw">const</span> <span class="fn">CATS</span> = [
+  <span class="str">'Magliette'</span>,
+  <span class="str">'Felpe'</span>,
+  <span class="str">'Cappellini'</span>,
+  <span class="str">'Sneakers'</span>,
+  <span class="str">'Accessori'</span>
+];
+
+<span class="cm">// Aggiungine una nuova:</span>
+<span class="kw">const</span> <span class="fn">CATS</span> = [
+  <span class="str">'Magliette'</span>,
+  <span class="str">'Felpe'</span>,
+  <span class="str">'Cappellini'</span>,
+  <span class="str">'Sneakers'</span>,
+  <span class="str">'Accessori'</span>,
+  <span class="str">'Orologi ⌚'</span>  <span class="cm">// ← aggiunta!</span>
+];</pre>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">✅ Risultato</div>
+        <div class="result-text">Il filtro "Orologi" apparirà automaticamente nello shop — il codice lo legge dall'array da solo!</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Apri la console del browser (F12 → Console) e scrivi: <code style="color:#818CF8">console.log(CATS)</code>. Cosa vedi?</div>
+        <div class="challenge-hint">La console è come WhatsApp tra te e il codice. Puoi scriverci per vedere cosa contiene ogni variabile.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(3,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 4 -->
+  <div class="mission" id="m4">
+    <div class="mission-hdr" onclick="toggle(4)">
+      <div class="lvl">🔧</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 4 — Cambia la Password Admin</div>
+        <div class="mission-sub">Impari: JavaScript · Costanti · If/Else</div>
+      </div>
+      <span class="mission-tag tag-js">JS</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">La password admin è "admin123" — troppo facile! Cambiala con qualcosa che solo tu sai.</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: Costanti e If/Else</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><code style="color:#818CF8">const</code> è come <code style="color:#818CF8">let</code> ma non si può cambiare dopo. Perfetto per la password.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>If/Else</strong> = "SE una cosa è vera, FAI questo, ALTRIMENTI fai quest'altro".</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Il simbolo <code style="color:#818CF8">===</code> significa "è esattamente uguale a". È diverso da <code style="color:#818CF8">=</code> che significa "assegna il valore".</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Come funziona il login</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JavaScript</span></div>
+          <pre><span class="cm">// La password è salvata qui:</span>
+<span class="kw">const</span> <span class="fn">PW</span> = <span class="str">'admin123'</span>;  <span class="cm">// ← cambia questo</span>
+
+<span class="cm">// La funzione di login usa un if/else:</span>
+<span class="kw">function</span> <span class="fn">doLogin</span>() {
+  <span class="cm">// Prende quello che hai scritto nel form</span>
+  <span class="kw">const</span> tentativo = document.<span class="fn">getElementById</span>(<span class="str">'pw'</span>).value;
+
+  <span class="kw">if</span> (tentativo === PW) {
+    <span class="cm">// Giusto! Accesso consentito</span>
+    isAdmin = <span class="kw">true</span>;
+  } <span class="kw">else</span> {
+    <span class="cm">// Sbagliato! Mostra errore</span>
+    <span class="fn">toast</span>(<span class="str">'Password sbagliata! ❌'</span>);
+  }
+}</pre>
+        </div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Aggiungi un messaggio personalizzato quando si sbaglia la password. Cambia il testo dentro <code style="color:#818CF8">toast('...')</code> con qualcosa di divertente.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(4,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 5 -->
+  <div class="mission" id="m5">
+    <div class="mission-hdr" onclick="toggle(5)">
+      <div class="lvl">💾</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 5 — Capire il Salvataggio Dati</div>
+        <div class="mission-sub">Impari: localStorage · JSON · Dati persistenti</div>
+      </div>
+      <span class="mission-tag tag-data">DATA</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Quando aggiungi un prodotto e ricarichi la pagina, il prodotto è ancora lì. Come funziona? Il browser lo memorizza. Scopriamolo.</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: localStorage e JSON</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>localStorage</strong> è come un cassetto nel browser. Puoi mettere dati dentro e restano anche se ricarichi la pagina.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>JSON</strong> è il formato con cui si salvano i dati: è un testo che sembra un oggetto JS. <code style="color:#818CF8">{"nome": "Alessio", "eta": 14}</code></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><code style="color:#818CF8">JSON.stringify()</code> = trasforma dati in testo da salvare. <code style="color:#818CF8">JSON.parse()</code> = rilegge il testo e lo ritrasforma in dati.</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Prova tu stesso — Console del browser (F12)</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">Console Browser</span><span style="color:#475569">F12 → Console</span></div>
+          <pre><span class="cm">// 1. Salva qualcosa</span>
+localStorage.<span class="fn">setItem</span>(<span class="str">'test'</span>, <span class="str">'ciao mondo'</span>);
+
+<span class="cm">// 2. Leggilo</span>
+localStorage.<span class="fn">getItem</span>(<span class="str">'test'</span>);
+<span class="cm">// → "ciao mondo"</span>
+
+<span class="cm">// 3. Guarda i prodotti di A-HUB!</span>
+localStorage.<span class="fn">getItem</span>(<span class="str">'ahub_v5_products'</span>);
+<span class="cm">// → vedrà tutti i tuoi prodotti in formato JSON</span>
+
+<span class="cm">// 4. Trasformali in dati leggibili</span>
+JSON.<span class="fn">parse</span>( localStorage.<span class="fn">getItem</span>(<span class="str">'ahub_v5_products'</span>) );
+<span class="cm">// → lista di oggetti, ogni oggetto = un prodotto</span></pre>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">🤯 Wow moment</div>
+        <div class="result-text">Vedi i tuoi prodotti scritti come oggetti JS? Ogni prodotto ha nome, prezzo, categoria... è così che i siti web memorizzano i dati!</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Dalla console scrivi: <code style="color:#818CF8">localStorage.clear()</code> poi ricarica la pagina. Cosa succede? Poi ricarica ancora — da dove vengono i prodotti demo?</div>
+        <div class="challenge-hint">Cerca nel codice la variabile DEMO. Questo si chiama "fallback" — un piano B quando non ci sono dati salvati.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(5,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 6 -->
+  <div class="mission" id="m6">
+    <div class="mission-hdr" onclick="toggle(6)">
+      <div class="lvl">🖱️</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 6 — Aggiungi un Bottone</div>
+        <div class="mission-sub">Impari: DOM · Events · onclick · Funzioni</div>
+      </div>
+      <span class="mission-tag tag-js">JS</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Aggiungi un bottone "CONDIVIDI" nella pagina Brand che copia il link dell'app negli appunti. Funzione utile per mandarlo agli amici!</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: DOM ed Events</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>DOM</strong> = Document Object Model. È come JavaScript "vede" la pagina HTML: ogni tag è un oggetto che puoi modificare.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Un <strong>Event</strong> è qualcosa che succede: click, scroll, pressione di un tasto. <code style="color:#818CF8">onclick</code> dice "quando clicchi, esegui questa funzione".</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Una <strong>funzione</strong> è un blocco di codice con un nome. La chiami e fa la sua cosa.</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Codice da aggiungere</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">HTML + JS</span><span style="color:#475569">sezione Brand nel file</span></div>
+          <pre><span class="cm">&lt;!-- 1. Aggiungi questo bottone nella sezione brand --&gt;</span>
+<span class="kw">&lt;button</span> <span class="pr">onclick</span>=<span class="str">"condividi()"</span> <span class="pr">class</span>=<span class="str">"prim"</span> <span class="pr">style</span>=<span class="str">"margin-top:16px"</span><span class="kw">&gt;</span>
+  📤 Condividi A-HUB
+<span class="kw">&lt;/button&gt;</span>
+
+<span class="cm">// 2. Aggiungi questa funzione nello &lt;script&gt;</span>
+<span class="kw">function</span> <span class="fn">condividi</span>() {
+  <span class="cm">// Copia il link della pagina negli appunti</span>
+  navigator.clipboard.<span class="fn">writeText</span>(window.location.href);
+  <span class="fn">toast</span>(<span class="str">'Link copiato! Mandalo agli amici 🔗'</span>);
+}</pre>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">✅ Risultato</div>
+        <div class="result-text">Clicca il bottone → il link di A-HUB viene copiato automaticamente. Hai appena usato una Web API del browser!</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Crea una funzione <code style="color:#818CF8">saluta(nome)</code> che mostra <code style="color:#818CF8">toast("Ciao " + nome + "!")</code>. Chiamala dalla console con <code style="color:#818CF8">saluta("Alessio")</code>.</div>
+        <div class="challenge-hint">Il + tra testo si chiama concatenazione. Unisce pezzi di testo insieme.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(6,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 7 -->
+  <div class="mission" id="m7">
+    <div class="mission-hdr" onclick="toggle(7)">
+      <div class="lvl">🔄</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 7 — Prodotto del Giorno automatico</div>
+        <div class="mission-sub">Impari: Oggetti JS · Math · Date</div>
+      </div>
+      <span class="mission-tag tag-js">JS</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Mostra un banner "OFFERTA DEL GIORNO 🔥" che evidenzia un prodotto diverso ogni giorno — automaticamente, senza toccare nulla.</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: Oggetti, Math e Date</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">Un <strong>Oggetto JS</strong> è come una scheda prodotto: ha proprietà con valori. <code style="color:#818CF8">{"nome": "Felpa", "prezzo": 59}</code></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Math.floor()</strong> arrotonda per difetto. <strong>Math.random()</strong> genera un numero casuale tra 0 e 1.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>new Date()</strong> crea un oggetto con la data di oggi. <code style="color:#818CF8">.getDay()</code> ti dà il giorno della settimana (0=domenica, 6=sabato).</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Codice da aggiungere</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JavaScript</span></div>
+          <pre><span class="cm">// Funzione: prende il "prodotto del giorno"</span>
+<span class="cm">// Usa il giorno della settimana come indice</span>
+<span class="kw">function</span> <span class="fn">getProdottoDelGiorno</span>() {
+  <span class="kw">const</span> oggi = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">getDay</span>(); <span class="cm">// 0-6</span>
+  <span class="kw">const</span> indice = oggi % products.length; <span class="cm">// resta sempre dentro la lista</span>
+  <span class="kw">return</span> products[indice]; <span class="cm">// ritorna il prodotto</span>
+}
+
+<span class="cm">// Usala così nella pagina shop:</span>
+<span class="kw">const</span> offerta = <span class="fn">getProdottoDelGiorno</span>();
+console.<span class="fn">log</span>(<span class="str">"Offerta oggi: "</span> + offerta.name);
+
+<span class="cm">// Il simbolo % è il "modulo" — dà il resto</span>
+<span class="cm">// della divisione. Es: 8 % 3 = 2</span>
+<span class="cm">// Serve per non uscire dai limiti dell'array.</span></pre>
+        </div>
+      </div>
+
+      <div class="vocab">
+        <div class="vword"><strong>Oggetto:</strong> dati con etichette</div>
+        <div class="vword"><strong>Array:</strong> lista ordinata</div>
+        <div class="vword"><strong>Indice:</strong> posizione in lista (parte da 0!)</div>
+        <div class="vword"><strong>%</strong> modulo: resto della divisione</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Extra</div>
+        <div class="challenge-text">Aggiungi un banner giallo in cima alla pagina shop che mostra il nome del prodotto del giorno. Usa <code style="color:#818CF8">document.getElementById()</code> per trovarlo e <code style="color:#818CF8">.textContent =</code> per cambiarne il testo.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(7,this)">✓ Missione Completata</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ MISSION 8 -->
+  <div class="mission" id="m8">
+    <div class="mission-hdr" onclick="toggle(8)">
+      <div class="lvl">🌐</div>
+      <div class="mission-meta">
+        <div class="mission-title">Missione 8 — Collegati a Internet (API)</div>
+        <div class="mission-sub">Impari: fetch · API · async/await · JSON da server</div>
+      </div>
+      <span class="mission-tag tag-pro">PRO</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="mission-body">
+
+      <div class="why-box">
+        <div class="why-label">🎯 Obiettivo App</div>
+        <div class="why-text">Mostra il tasso di cambio €/$ in tempo reale nella sezione Brand. Dati veri presi da Internet, aggiornati ogni secondo.</div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-label">📚 Concetto: API e fetch</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">Un'<strong>API</strong> è come un cameriere: tu fai una richiesta (URL), lui porta i dati dal server.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>fetch(url)</strong> è il comando JS per fare una richiesta a Internet e ricevere dati.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>async/await</strong>: siccome Internet ci mette tempo, diciamo al codice di aspettare la risposta prima di continuare.</div></div>
+      </div>
+
+      <div>
+        <div class="slabel">Esempio funzionante</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JavaScript</span><span style="color:#475569">prova nella console (F12)</span></div>
+          <pre><span class="cm">// API gratuita di cambio valuta</span>
+<span class="kw">async function</span> <span class="fn">getCambio</span>() {
+  <span class="cm">// 1. Fai la richiesta all'API</span>
+  <span class="kw">const</span> risposta = <span class="kw">await</span> <span class="fn">fetch</span>(
+    <span class="str">'https://api.exchangerate-api.com/v4/latest/EUR'</span>
+  );
+
+  <span class="cm">// 2. Converti la risposta in oggetto JS</span>
+  <span class="kw">const</span> dati = <span class="kw">await</span> risposta.<span class="fn">json</span>();
+
+  <span class="cm">// 3. Prendi il valore del dollaro</span>
+  <span class="kw">const</span> dollaro = dati.rates.USD;
+
+  console.<span class="fn">log</span>(<span class="str">"1€ = $"</span> + dollaro);
+  <span class="fn">toast</span>(<span class="str">"1€ = $"</span> + dollaro.<span class="fn">toFixed</span>(<span class="nm">2</span>));
+}
+
+<span class="cm">// Chiamala!</span>
+<span class="fn">getCambio</span>();</pre>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">🌐 Questo è il Back-End!</div>
+        <div class="result-text">Quello che hai appena fatto è la base del back-end: un server in giro per il mondo ha dei dati, tu li chiedi con fetch(), lui risponde in JSON. Ogni app moderna funziona così — Instagram, TikTok, tutto.</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">⚡ Sfida Finale</div>
+        <div class="challenge-text">Prova questa API gratuita che dà fatti random sui numeri:<br><code style="color:#818CF8">fetch('http://numbersapi.com/42/math')</code><br>Poi <code style="color:#818CF8">.text()</code> invece di <code style="color:#818CF8">.json()</code> — perché la risposta è solo testo. Mostralo con toast()!</div>
+        <div class="challenge-hint">Alcune API rispondono in JSON (dati strutturati), altre in testo semplice. Devi sapere quale aspettarti.</div>
+      </div>
+
+      <button class="complete-btn" onclick="complete(8,this)">✓ Missione Completata 🏆</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div style="font-size:28px;margin-bottom:12px">🏆</div>
+    <div style="font-size:16px;font-weight:700;color:#E2E8F0;margin-bottom:6px">Hai completato A-HUB Dev Academy</div>
+    <div style="color:#475569;font-size:13px;max-width:400px;margin:0 auto;line-height:1.6">
+      Ora conosci HTML, CSS, JavaScript, localStorage, DOM, Events, Oggetti, API e fetch.<br>
+      Queste sono le basi di ogni sito web al mondo. 🌍
+    </div>
+    <div style="margin-top:24px;color:#334155;font-size:11px">A-HUB Dev Academy — Built with 💜 by papà</div>
+  </div>
+
+</div>
+
+<script>
+  // Progress tracking
+  const done = new Set(JSON.parse(localStorage.getItem('ahub_academy_done')||'[]'));
+  
+  function toggle(n) {
+    const m = document.getElementById('m'+n);
+    m.classList.toggle('open');
+  }
+  
+  function complete(n, btn) {
+    done.add(n);
+    localStorage.setItem('ahub_academy_done', JSON.stringify([...done]));
+    btn.textContent = '✅ Completata!';
+    btn.classList.add('done');
+    updateProgress();
+  }
+  
+  function updateProgress() {
+    const pct = (done.size / 8) * 100;
+    document.getElementById('prog').style.width = pct + '%';
+    document.getElementById('prog-text').textContent = done.size + ' / 8 missioni completate';
+  }
+  
+  // Restore state
+  done.forEach(n => {
+    const btn = document.querySelector('#m'+n+' .complete-btn');
+    if (btn) { btn.textContent = '✅ Completata!'; btn.classList.add('done'); }
+  });
+  updateProgress();
+</script>
+</body>
+</html>

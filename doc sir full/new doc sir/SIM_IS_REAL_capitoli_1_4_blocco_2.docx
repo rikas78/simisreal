@@ -1,0 +1,21 @@
+SIM IS REAL
+Documento Master Integrato
+Capitolo 3 — Mercato e opportunità
+
+Il mercato del sim racing competitivo è cresciuto in complessità e varietà, ma resta spesso frammentato dal punto di vista dell’esperienza utente. Esistono strumenti validi per singole funzioni, ma molto meno spesso una struttura unificata che colleghi identità, eventi, team, progressione e monetizzazione. SIM IS REAL si colloca proprio in questo spazio: non come semplice tool, ma come ecosistema federale orientato alla continuità.
+
+Il focus iniziale su Gran Turismo 7 è una scelta strategica di accessibilità e rilevanza. GT7 consente di partire da una base ampia e riconoscibile, con utenti già abituati a un contesto competitivo. Questo permette di validare la piattaforma su un segmento ben definito, riducendo il rischio di dispersione e rendendo più semplice la comunicazione del valore offerto.
+
+Il target non è solo il driver competitivo, ma anche il team manager, l’organizzatore, lo steward, il commentatore, il designer e chi lavora intorno alla dimensione sportiva e contenutistica del sim racing. Il progetto ha quindi un mercato potenziale più ampio del solo pubblico gara, perché integra competenze, ruoli e servizi complementari. Questa ampiezza è un vantaggio, ma richiede ordine: il valore deve essere espresso con chiarezza, altrimenti il prodotto rischia di apparire troppo ricco e quindi poco leggibile.
+
+L’opportunità principale consiste nel creare un ambiente in cui performance, reputazione, team e valore economico convivano in una sola struttura. In questo modo SIM IS REAL si differenzia sia dalle piattaforme orientate solo ai risultati sia da quelle dedicate solo a community o contenuti. La differenziazione non sta solo nelle feature, ma nella capacità di presentare un sistema coerente, con una narrativa forte e un’esperienza più professionale.
+
+Capitolo 4 — Prodotto e architettura funzionale
+
+Il prodotto si fonda su un hub agnostico, cioè una logica che consente di gestire più simulatori e più sorgenti senza vincolarsi a un solo ambiente. Questo principio è importante perché protegge il progetto da lock-in e mantiene aperta la strada a future estensioni. L’idea è avere un’identità unica per il driver, ma una piattaforma capace di riconoscere e organizzare più contesti competitivi.
+
+L’architettura funzionale si divide in area pubblica e area autenticata. L’area pubblica ha il compito di spiegare il progetto, rendere visibili le competizioni, presentare Academy, regolamenti e partner, e guidare l’utente verso la registrazione. L’area autenticata, invece, diventa il centro operativo: profilo federale, wallet, eventi, telemetria, team e marketplace. La distinzione tra le due aree è essenziale per mantenere il sistema chiaro e per far comprendere subito dove l’utente si trova nel proprio percorso.
+
+Le funzioni core comprendono identità federale, registrazione, gestione profilo, wallet GW, eventi, ranking, scuderie, certificazioni e marketplace. Questi moduli rappresentano il minimo strutturale affinché la piattaforma sia davvero operativa. Ogni funzione deve essere progettata per avere un impatto diretto sul comportamento dell’utente: partecipazione, progressione, retention o monetizzazione.
+
+La telemetria e il coaching rappresentano un’estensione ad alto valore. Non sono semplicemente un “extra tecnico”, ma una parte importante della promessa di prodotto, perché trasformano i dati in miglioramento concreto. Allo stesso modo, il team management non è una funzione accessoria: è uno dei punti che rende SIM IS REAL un ecosistema e non solo un aggregatore di gare.
